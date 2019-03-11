@@ -1,5 +1,8 @@
-from btattendance import app
+from btattendance import create_app
 from flask import render_template
+
+
+app = create_app()
 
 
 # Index

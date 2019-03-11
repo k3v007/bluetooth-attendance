@@ -4,15 +4,20 @@ from flask_migrate import Migrate
 from btattendance.config import Config
 
 
-app = Flask(__name__)
+db = SQLAlchemy()
+migrate = Migrate()
 
-app.config.from_object(Config)
 
-db = SQLAlchemy(app)
-Migrate(app, db)
+def create_app(config_class=Config):
+    app = Flask(__name__)
+    app.config.from_object(config_class)
 
-from btattendance.students.views import students # noqa
-from btattendance.teachers.views import teachers # noqa
+    db.init_app(app)
+    migrate.init_app(app, db)
 
-app.register_blueprint(students)
-app.register_blueprint(teachers)
+    from btattendance.students.views import students # noqa
+    from btattendance.teachers.views import teachers # noqa
+    app.register_blueprint(students)
+    app.register_blueprint(teachers)
+
+    return app
