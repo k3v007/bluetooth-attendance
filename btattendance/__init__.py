@@ -1,12 +1,12 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from btattendance.config import Config
+
 
 app = Flask(__name__)
 
-app.config['SECRET_KEY'] = 'vks1234'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:root1234@localhost/btDB'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config.from_object(Config)
 
 db = SQLAlchemy(app)
 Migrate(app, db)
