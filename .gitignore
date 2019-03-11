@@ -1,2 +1,6 @@
 # Visual Studio Code files
 /.vscode/
+
+# Pycache
+/__pycache__/
+*.pyc
