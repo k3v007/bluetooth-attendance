@@ -4,3 +4,6 @@
 # Pycache
 /__pycache__/
 *.pyc
+
+# Flask Migration
+/migrations
