@@ -9,14 +9,14 @@ class Student(db.Model):
     rollno = db.Column(db.Text)
     email = db.Column(db.Text)
     password_hash = db.Column(db.Text)
-    macad = db.Column(db.Text)
+    bd_addr = db.Column(db.Text)
 
-    def __init__(self, name, rollno, email, password, macad):
+    def __init__(self, name, rollno, email, password, bd_addr):
         self.name = name
         self.rollno = rollno
         self.email = email
         self.password_hash = generate_password_hash(password)
-        self.macad = macad
+        self.bd_addr = bd_addr
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)

@@ -5,8 +5,9 @@ from flask import render_template
 app = create_app()
 
 
-# Index
+# Home
 @app.route('/')
+@app.route('/home')
 def index():
     return render_template('home.html')
 
