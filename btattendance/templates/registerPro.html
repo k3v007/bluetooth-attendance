@@ -1,25 +1,72 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-  <h1>Register</h1>
-  {% from "includes/_formhelpers.html" import render_field %}
-  <form method="POST" action="">
-    <div class="form-group">
-      {{render_field(form.name, class_="form-control")}}
-    </div>
-    <div class="form-group">
-      {{render_field(form.email, class_="form-control")}}
-    </div>
-    <div class="form-group">
-      {{render_field(form.subject, class_="form-control")}}
-    </div>
-    <div class="form-group">
-      {{render_field(form.password, class_="form-control")}}
-    </div>
-    <div class="form-group">
-      {{render_field(form.confirm, class_="form-control")}}
-    </div>
-    <p><input type="submit" class="btn btn-primary" value="Submit"></p>
-  </form>
-    <hr>
+<div class="jumbotron mt-3">
+  <h1 class="display-4 text-center">Register Teacher</h1>
+  <div class="content-section">
+    <form action="", method="POST">
+      {{ form.hidden_tag() }}
+      <div class="form-group">
+        {{ form.name.label }}
+        {% if form.name.errors %}
+          {{ form.name(class="form-control form-control-lg is-invalid", placeholder="Enter Name") }}
+          <div class="invalid-feedback">
+            {% for error in form.name.errors %}
+              <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+        {% else %}
+          {{ form.name(class="form-control form-control-lg", placeholder="Enter Name") }}  
+        {% endif %}
+      </div>
+      <div class="form-group">
+        {{ form.email.label }}
+        {% if form.email.errors %}
+          {{ form.email(class="form-control form-control-lg is-invalid", placeholder="Enter e-mail") }}
+          <div class="invalid-feedback">
+            {% for error in form.email.errors %}
+              <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+        {% else %}
+          {{ form.email(class="form-control form-control-lg", placeholder="Enter e-mail") }}  
+        {% endif %}
+      </div>
+      <div class="form-group">
+        {{ form.password.label }}
+        {% if form.password.errors %}
+          {{ form.password(class="form-control form-control-lg is-invalid", placeholder="Enter Password") }}
+          <div class="invalid-feedback">
+            {% for error in form.password.errors %}
+              <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+        {% else %}
+          {{ form.password(class="form-control form-control-lg", placeholder="Enter Password") }}  
+        {% endif %}
+      </div>
+      <div class="form-group">
+        {{ form.confirm_password.label }}
+        {% if form.confirm_password.errors %}
+          {{ form.confirm_password(class="form-control form-control-lg is-invalid", placeholder="Confirm Password") }}
+          <div class="invalid-feedback">
+            {% for error in form.confirm_password.errors %}
+              <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+        {% else %}
+          {{ form.confirm_password(class="form-control form-control-lg", placeholder="Confirm Password") }}  
+        {% endif %}
+      </div>
+      <div class="text-center">
+        {{ form.submit(class="btn btn-outline-info") }}
+      </div>      
+    </form>
+  </div>
+  <div class="pt-3 text-center">
+    <small class="text-muted">
+      Already have an account? <a class="ml-1" href="{{ url_for('students.login') }}">Log In</a>
+    </small>
+  </div>
+</div>
 {% endblock %}

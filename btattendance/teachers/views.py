@@ -1,7 +1,7 @@
-from flask import (Blueprint, redirect, render_template, request,
+from flask import (Blueprint, redirect, render_template,
                    url_for, flash, session)
 from btattendance.utils import is_logged_in
-from btattendance.teachers.forms import Registration
+from btattendance.teachers.forms import RegistrationForm, LoginForm
 
 teachers = Blueprint('teachers', __name__)
 
@@ -9,8 +9,8 @@ teachers = Blueprint('teachers', __name__)
 # Professor Register
 @teachers.route('/register', methods=['GET', 'POST'])
 def register():
-    form = Registration(request.form)
-    if request.method == 'POST' and form.validate():
+    form = RegistrationForm()
+    if form.validate_on_submit():
         name = form.name.data
         email = form.email.data
         subject = form.subject.data
@@ -22,70 +22,31 @@ def register():
         flash('You are now registered and can log in', 'success')
 
         return redirect(url_for('teachers.login'))
-    return render_template('registerPro.html', form=form)
+    return render_template('registerPro.html', form=form, title='Register')
 
 
 # Professor login
 @teachers.route('/login', methods=['GET', 'POST'])
 def login():
-    if request.method == 'POST':
-        # Get Form Fields
-        email = request.form['email']
-        password_candidate = request.form['password']
+    form = LoginForm()
+    if form.validate_on_submit():
+        return redirect(url_for('teachers.dashboard'))
 
-        # DB task
-        # result = cur.execute("SELECT * FROM professors WHERE 
-        # email = %s", [email])
-        result = []
-        cur = []
-
-        if result > 0:
-            # Get stored hash
-            data = cur.fetchone()
-            password = data['password']
-            username = data['name']
-            sub = data['subject']
-            # Compare Passwords
-            if result.check_password(password_candidate, password):
-                # Passed
-                session['logged_in'] = True
-                session['username'] = username
-                session['student'] = False
-                session['subject'] = sub
-
-                flash('You are now logged in', 'success')
-                return redirect(url_for('teachers.dashboard'))
-            else:
-                error = 'Invalid login'
-                return render_template('loginPro.html', error=error)
-            # Close connection
-            cur.close()
-        else:
-            error = 'Username not found'
-            return render_template('loginPro.html', error=error)
-
-    return render_template('loginPro.html')
+    return render_template('loginPro.html', form=form, title='Log In')
 
 
 # Dashboard Professors
 @teachers.route('/dashboard')
 @is_logged_in
 def dashboard():
-    subject = session['subject']
     # DB task
-    result = []
-    cur = []
+    
     # result = cur.execute("SELECT name, attendance.id, subject, presabs,
-    # class_date FROM students, attendance WHERE attendance.macad =
-    # students.macad and subject = %s", [subject])
+    # class_date FROM students, attendance WHERE attendance.bd_addr =
+    # students.bd_addr and subject = %s", [subject])
 
-    if result > 0:
-        return render_template('dashboardPro.html', attends=attends)
-    else:
-        msg = 'No Attendance Found'
-        return render_template('dashboardPro.html', msg=msg)
+    return render_template('dashboardPro.html')
     # Close connection
-    cur.close()
 
 
 # Check Attendance
@@ -94,15 +55,15 @@ def dashboard():
 def check_attendance():
     sub = session['subject']  
     # DB task
-    # result = cur.execute("SELECT macad FROM students")
+    # result = cur.execute("SELECT bd_addr FROM students")
     result = []
     cur = []
-    macads = cur.fetchall()
+    bd_addrs = cur.fetchall()
 
-    print(macads)
+    print(bd_addrs)
     if result > 0:
         print("Hello1")
-        # bluescan.delay(macads, sub)
+        # bluescan.delay(bd_addrs, sub)
         return render_template('scan_prog.html')
     else:
         msg = 'No Records Found'
