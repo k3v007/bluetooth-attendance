@@ -1,4 +1,4 @@
-from flask import (Blueprint, redirect, render_template, request,
+from flask import (Blueprint, redirect, render_template,
                    url_for, flash, session)
 from btattendance.utils import is_logged_in
 from btattendance.students.forms import RegistrationForm, LoginForm
@@ -36,21 +36,7 @@ def login():
 @students.route('/dashboard')
 @is_logged_in
 def dashboard():  
-    bd_addrress = session['bd_addrdress']
-    # DB task
-    # result = cur.execute("SELECT * FROM attendance WHERE bd_addr = %s", [bd_addrress])
-    result = []
-    cur = []
-
-    attends = cur.fetchall()
-
-    print(attends)
-
-    if result > 0:
-        return render_template('dashboardStu.html', attends=attends)
-    else:
-        msg = 'No Attendance Found'
-        return render_template('dashboardStu.html', msg=msg)
+    return render_template('dashboardStu.html')
 
 
 # Logout

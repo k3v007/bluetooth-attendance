@@ -17,7 +17,7 @@ def create_app(config_class=Config):
 
     from btattendance.students.views import students # noqa
     from btattendance.teachers.views import teachers # noqa
-    app.register_blueprint(students)
-    app.register_blueprint(teachers)
+    app.register_blueprint(students, url_prefix='/student')
+    app.register_blueprint(teachers, url_prefix='/teacher')
 
     return app
