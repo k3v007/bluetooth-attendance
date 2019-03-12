@@ -1,55 +1,57 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Bluetooth Attendance App</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='mystyle.css') }}">
-    <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='bluetooth_DIf_icon.ico') }}">
-      
-  </head>
-  <body>
-    {% include 'includes/_navbar.html' %}
-    <header class="jumbotron1">
-        <div class="headline">
-            <div class="container">
-               <h1></h1>
-                <h2></h2>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bluetooth Attendance App</title>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+<link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='bluetooth.ico') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
+    
+</head>
+<body>
+    
+    <nav class="navbar navbar-expand-lg navbar-dark bg-secondary">
+    <a class="navbar-brand" href="{{ url_for('index') }}">
+        <img src="{{ url_for('static', filename='nav_logo.png') }}" width=25 height=35 alt="" class="d-inline-block align-top">
+        <span style="font-size: 110%">Bluetooth Attendance</span>            
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+        <ul class="navbar-nav">
+        <li class="nav-item active">
+            <a class="nav-link ml-1" href="{{ url_for('index') }}">Home <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item active">
+            <a class="nav-link" href="#">Dashboard</a>
+        </li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Dropdown link
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+            <a class="dropdown-item" href="#">Action</a>
+            <a class="dropdown-item" href="#">Another action</a>
+            <a class="dropdown-item" href="#">Something else here</a>
             </div>
-        </div>
-    </header>
-
-      
-    <div class="container">
-        <div class="row row-content">
-            {% include 'includes/_messages.html' %}
-            {% block body %}{% endblock %}
-        </div>
-        
-
-      
+        </li>
+        </ul>
     </div>
-      
-      <footer class="row-footer footer navbar-fixed-bottom">
-            <div class="container">
-                <div class="row">
-                    <div class="col-sm-9">
-                    </div>
-                    <div class="col-sm-3">
-                        <p>Developed By Vivek Kr. Sinha</p>
-                    </div>
-                    
-                </div>
-            </div>
-        </footer>
-
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <script src="//cdn.ckeditor.com/4.6.2/basic/ckeditor.js"></script>
-    <script type="text/javascript">
-      CKEDITOR.replace('editor')
-    </script>
-  </body>
+    </nav>
+    
+    <div class="container">
+        {% block body %}{% endblock %}
+    </div>      
+    
+    <div class="navbar fixed-bottom">
+        <p class="text-center">Developed by Vivek Kr. Sinha</p>
+    </div>
+    
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+</body>
 </html>

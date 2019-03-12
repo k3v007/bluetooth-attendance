@@ -1,9 +1,10 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-  <div class="jumbotron text-center">
-    <h1>Welcome To Bluetooth Attendance WebApp</h1>
-    <p class="lead">This application is built on the Python Flask framework and Has Celery working in the background for executing the asynchronous tasks</p>
+  <div class="jumbotron text-center mt-3">
+    <h1 class="display-4">Bluetooth Attendance WebApp</h1>
+    <p></p>
+    <p class="lead">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Dolorem doloremque voluptatum molestiae animi accusantium, quam dignissimos aliquam optio! Veritatis, distinctio. Possimus, beatae? Inventore, nostrum. Quod optio ut aut perferendis aliquid!</p>
     {% if session.logged_in == NULL %}
       <a href="{{ url_for('teachers.register') }}" class="btn btn-primary btn-lg">Teacher Register</a>
       <a href="{{ url_for('teachers.login') }}" class="btn btn-success btn-lg">Teacher Login</a>
