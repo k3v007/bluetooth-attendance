@@ -1,0 +1,8 @@
+from btattendance import create_app, db
+from btattendance.models import *
+
+app = create_app()
+app.app_context().push()
+db.init_app(app)
+db.create_all()
+db.session.commit()
