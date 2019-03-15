@@ -4,6 +4,7 @@ from btattendance.models import *
 app = create_app()
 app.app_context().push()
 db.init_app(app)
+db.drop_all()
 db.create_all()
 db.session.commit()
 

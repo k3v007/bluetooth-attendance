@@ -7,3 +7,6 @@
 
 # Flask Migration
 /migrations
+
+# Profile images
+btattendance/static/profile_students

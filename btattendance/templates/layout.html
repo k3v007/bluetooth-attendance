@@ -16,11 +16,11 @@
 <body>
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-secondary">
-        <a class="navbar-brand" href="{{ url_for('index') }}">
+        <div class="navbar-brand">
             <img src="{{ url_for('static', filename='nav_logo.png') }}" width=25 height=35 alt=""
                 class="d-inline-block align-top">
             <span style="font-size: 110%">Bluetooth Attendance</span>
-        </a>
+        </div>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown"
             aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -32,7 +32,7 @@
                     <a class="nav-link" href="{{ url_for('students.dashboard') }}">Dashboard</a>
                 </li>
                 <li class="nav-item active">
-                    <a class="nav-link" href="#">My Account</a>
+                    <a class="nav-link" href="{{ url_for('students.account') }}">My Account</a>
                 </li>
                 <li class="nav-item active">
                     <a class="nav-link" href="{{ url_for('students.logout') }}">Logout</a>
@@ -60,25 +60,41 @@
         </div>
     </nav>
 
-    <div class="container">
-        {% with messages = get_flashed_messages(with_categories=True) %}
-        {% if messages %}
-        {% for category, message in messages %}
-        <div class="alert alert-{{ category }} alert-dismissible fade show mt-3" role="alert">
-            {{ message }}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
+    <main role="main" class="container">
+        <div class="row">
+            <div class="col-md-8">
+                {% with messages = get_flashed_messages(with_categories=True) %}
+                {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show mt-3" role="alert">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                {% endfor %}
+                {% endif %}
+                {% endwith %}
+                {% block body %}{% endblock %}
+            </div>
+            <div class="col-md-4 mt-3 border rounded bg-light">
+                <div class="content-section p-2">
+                    <h3 class="my-1">Our Sidebar</h3>
+                    <p class='text-muted mt-2'>You can put any information here you'd like.
+                        <ul class="list-group">
+                            <li class="list-group-item list-group-item-light">Latest Posts</li>
+                            <li class="list-group-item list-group-item-light">Announcements</li>
+                            <li class="list-group-item list-group-item-light">Calendars</li>
+                            <li class="list-group-item list-group-item-light">etc</li>
+                        </ul>
+                    </p>
+                </div>
+            </div>
         </div>
-        {% endfor %}
-        {% endif %}
-        {% endwith %}
-        {% block body %}{% endblock %}
-    </div>
-
-    <div class="navbar fixed-bottom">
-        <p class="text-center">Developed by Vivek Kr. Sinha</p>
-    </div>
+        <div class="navbar fixed-bottom">
+            <p class="text-center">Developed by Vivek Kr. Sinha</p>
+        </div>
+    </main>
 
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
         integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"

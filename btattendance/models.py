@@ -52,6 +52,8 @@ class Student(db.Model, UserMixin):
     name = db.Column(db.String(50), nullable=False)
     rollno = db.Column(db.String(7), nullable=False, unique=True)
     email = db.Column(db.String(80), nullable=False, unique=True)
+    profile_img = db.Column(
+        db.String(50), nullable=False, default='default.jpg')
     password_hash = db.Column(db.String(100), nullable=False)
     bd_addr = db.Column(db.String(90), nullable=False, unique=True)
     department_id = db.Column(db.Integer, db.ForeignKey(
