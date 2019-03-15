@@ -1,26 +1,41 @@
-from btattendance import db
+from btattendance import db, login_manager
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import UserMixin
 from datetime import datetime
 import enum
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return Student.query.get(int(user_id))
+
+
+class DeptCode(enum.Enum):
+    bt = 'Bio-technology'
+    coe = 'Computer Engineering'
+    ece = 'Electronics and Communication Engineering'
+    ice = 'Instrumentation and Control Engineering'
+    it = 'Information Technology'
+    me = 'Mechanical Engineering'
 
 
 class Department(db.Model):
     __tablename__ = 'departments'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), nullable=False, unique=True)
+    dept_code = db.Column(db.Enum(DeptCode), nullable=False)
     hod = db.Column(db.String(50), nullable=False, unique=True)
     hod_email = db.Column(db.String(80), nullable=False, unique=True)
     students = db.relationship('Student', backref='department', lazy=True)
     teachers = db.relationship('Teacher', backref='department', lazy=True)
     courses = db.relationship('Course', backref='department', lazy=True)
 
-    def __init__(self, name, hod, hod_email):
-        self.name = name
+    def __init__(self, dept_code, hod, hod_email):
+        self.dept_code = DeptCode[dept_code]
         self.hod = hod
         self.hod_email = hod_email
 
     def __repr__(self):
-        return f"Department('{self.name}', '{self.hod}', '{self.hod_email}')"
+        return f"Department({self.dept_code}', '{self.hod}', '{self.hod_email}')"
 
 
 registration = db.Table('registration_info',
@@ -31,7 +46,7 @@ registration = db.Table('registration_info',
                         )
 
 
-class Student(db.Model):
+class Student(db.Model, UserMixin):
     __tablename__ = 'students'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)

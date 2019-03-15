@@ -4,89 +4,102 @@
 <div class="jumbotron mt-3">
   <h1 class="display-4 text-center">Register Student</h1>
   <div class="content-section">
-    <form action="", method="POST">
+    <form action="" , method="POST">
       {{ form.hidden_tag() }}
       <div class="form-group">
         {{ form.name.label }}
         {% if form.name.errors %}
-          {{ form.name(class="form-control form-control-lg is-invalid", placeholder="Enter Name") }}
-          <div class="invalid-feedback">
-            {% for error in form.name.errors %}
-              <span>{{ error }}</span>
-            {% endfor %}
-          </div>
+        {{ form.name(class="form-control form-control-lg is-invalid", placeholder="Enter Name") }}
+        <div class="invalid-feedback">
+          {% for error in form.name.errors %}
+          <span>{{ error }}</span>
+          {% endfor %}
+        </div>
         {% else %}
-          {{ form.name(class="form-control form-control-lg", placeholder="Enter Name") }}  
+        {{ form.name(class="form-control form-control-lg", placeholder="Enter Name") }}
         {% endif %}
       </div>
       <div class="form-group">
         {{ form.rollno.label }}
         {% if form.rollno.errors %}
-          {{ form.rollno(class="form-control form-control-lg is-invalid", placeholder="Enter Roll No.") }}
-          <div class="invalid-feedback">
-            {% for error in form.rollno.errors %}
-              <span>{{ error }}</span>
-            {% endfor %}
-          </div>
+        {{ form.rollno(class="form-control form-control-lg is-invalid", placeholder="Enter Roll No.") }}
+        <div class="invalid-feedback">
+          {% for error in form.rollno.errors %}
+          <span>{{ error }}</span>
+          {% endfor %}
+        </div>
         {% else %}
-          {{ form.rollno(class="form-control form-control-lg", placeholder="Enter Roll No.") }}  
+        {{ form.rollno(class="form-control form-control-lg", placeholder="Enter Roll No.") }}
         {% endif %}
       </div>
       <div class="form-group">
         {{ form.email.label }}
         {% if form.email.errors %}
-          {{ form.email(class="form-control form-control-lg is-invalid", placeholder="Enter e-mail") }}
-          <div class="invalid-feedback">
-            {% for error in form.email.errors %}
-              <span>{{ error }}</span>
-            {% endfor %}
-          </div>
+        {{ form.email(class="form-control form-control-lg is-invalid", placeholder="Enter e-mail") }}
+        <div class="invalid-feedback">
+          {% for error in form.email.errors %}
+          <span>{{ error }}</span>
+          {% endfor %}
+        </div>
         {% else %}
-          {{ form.email(class="form-control form-control-lg", placeholder="Enter e-mail") }}  
+        {{ form.email(class="form-control form-control-lg", placeholder="Enter e-mail") }}
         {% endif %}
       </div>
       <div class="form-group">
         {{ form.bd_addr.label }}
         {% if form.bd_addr.errors %}
-          {{ form.bd_addr(class="form-control form-control-lg is-invalid", placeholder="Enter Bluetooth Address") }}
-          <div class="invalid-feedback">
-            {% for error in form.bd_addr.errors %}
-              <span>{{ error }}</span>
-            {% endfor %}
-          </div>
+        {{ form.bd_addr(class="form-control form-control-lg is-invalid", placeholder="Enter Bluetooth Address") }}
+        <div class="invalid-feedback">
+          {% for error in form.bd_addr.errors %}
+          <span>{{ error }}</span>
+          {% endfor %}
+        </div>
         {% else %}
-          {{ form.bd_addr(class="form-control form-control-lg", placeholder="Enter Bluetooth Address") }}  
+        {{ form.bd_addr(class="form-control form-control-lg", placeholder="Enter Bluetooth Address") }}
+        {% endif %}
+      </div>
+      <div class="form-group">
+        {{ form.department.label }}
+        {% if form.department.errors %}
+        {{ form.department(class="form-control form-control-lg is-invalid") }}
+        <div class="invalid-feedback">
+          {% for error in form.department.errors %}
+          <span>{{ error }}</span>
+          {% endfor %}
+        </div>
+        {% else %}
+        {{ form.department(class="form-control form-control-lg") }}
         {% endif %}
       </div>
       <div class="form-group">
         {{ form.password.label }}
         {% if form.password.errors %}
-          {{ form.password(class="form-control form-control-lg is-invalid", placeholder="Enter Password") }}
-          <div class="invalid-feedback">
-            {% for error in form.password.errors %}
-              <span>{{ error }}</span>
-            {% endfor %}
-          </div>
+        {{ form.password(class="form-control form-control-lg is-invalid", placeholder="Enter Password") }}
+        <div class="invalid-feedback">
+          {% for error in form.password.errors %}
+          <span>{{ error }}</span>
+          {% endfor %}
+        </div>
         {% else %}
-          {{ form.password(class="form-control form-control-lg", placeholder="Enter Password") }}  
+        {{ form.password(class="form-control form-control-lg", placeholder="Enter Password") }}
         {% endif %}
       </div>
       <div class="form-group">
         {{ form.confirm_password.label }}
         {% if form.confirm_password.errors %}
-          {{ form.confirm_password(class="form-control form-control-lg is-invalid", placeholder="Confirm Password") }}
-          <div class="invalid-feedback">
-            {% for error in form.confirm_password.errors %}
-              <span>{{ error }}</span>
-            {% endfor %}
-          </div>
+        {{ form.confirm_password(class="form-control form-control-lg is-invalid", placeholder="Confirm Password") }}
+        <div class="invalid-feedback">
+          {% for error in form.confirm_password.errors %}
+          <span>{{ error }}</span>
+          {% endfor %}
+        </div>
         {% else %}
-          {{ form.confirm_password(class="form-control form-control-lg", placeholder="Confirm Password") }}  
+        {{ form.confirm_password(class="form-control form-control-lg", placeholder="Confirm Password") }}
         {% endif %}
       </div>
       <div class="text-center">
         {{ form.submit(class="btn btn-outline-info") }}
-      </div>      
+      </div>
     </form>
   </div>
   <div class="pt-3 text-center">

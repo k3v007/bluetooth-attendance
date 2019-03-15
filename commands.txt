@@ -6,3 +6,13 @@ app.app_context().push()
 db.init_app(app)
 db.create_all()
 db.session.commit()
+
+
+d1 = Department('coe', 'A K Sharma', 'aks@gmail.com')
+d2 = Department('it', 'V S Prasad', 'vsp@gmail.com')
+d3 = Department('ece', 'Manoj Khanna', 'manoj@gmail.com')
+d4 = Department('ice', 'Savita S.', 'savita@gmail.com')
+d5 = Department('me', 'Kavita M.', 'kavita@gmail.com')
+d6 = Department('bt', 'Sunil Vohra', 'sunil@gmail.com')
+db.session.add_all([d1, d2, d3, d4, d5, d6])
+db.session.commit()

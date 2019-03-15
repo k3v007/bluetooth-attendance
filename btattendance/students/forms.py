@@ -1,6 +1,8 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField
+from wtforms import (StringField, PasswordField, SubmitField, BooleanField,
+                     ValidationError, SelectField)
 from wtforms.validators import DataRequired, EqualTo, Length, Email, Regexp
+from btattendance.models import Student, DeptCode
 
 
 # Student Register Form Class
@@ -12,7 +14,7 @@ class RegistrationForm(FlaskForm):
     rollno = StringField('Roll No.', validators=[
         Length(min=7, max=7),
         DataRequired(),
-        Regexp('^[0-9]{3}[A-Z]{2}[0-9]{2}$', message="Roll No. format: '408CO15'")]) # noqa
+        Regexp('^[0-9]{3}[A-Z]{2}[0-9]{2}$', message="Roll No. format: '408CO15'")])  # noqa
     email = StringField('Email', validators=[
         Email(),
         DataRequired()
@@ -22,6 +24,8 @@ class RegistrationForm(FlaskForm):
         DataRequired(),
         Regexp('^([0-9A-Fa-f]{2}[:]){5}([0-9A-Fa-f]{2})$', message="Enter valid BD_ADDR [00:00:00:00:00:00]")  # noqa
     ])
+    department = SelectField('Department', choices=[
+                             (d.name, d.value) for d in DeptCode])
     password = PasswordField('Password', validators=[
         DataRequired(),
         Length(min=4, max=50)
@@ -31,6 +35,20 @@ class RegistrationForm(FlaskForm):
         EqualTo('password', message='Passwords did not match!')
     ])
     submit = SubmitField('Sign Up')
+
+    def validate_email(self, email):
+        if Student.query.filter_by(email=email.data).first():
+            raise ValidationError("This e-mail is already registered with us!")
+
+    def validate_rollno(self, rollno):
+        if Student.query.filter_by(rollno=rollno.data).first():
+            raise ValidationError(
+                "Student with this rollno is already registered with us!")
+
+    def validate_bd_addr(self, bd_addr):
+        if Student.query.filter_by(bd_addr=bd_addr.data).first():
+            raise ValidationError(
+                "Bluetooth Address already registered with us!")
 
 
 class LoginForm(FlaskForm):
