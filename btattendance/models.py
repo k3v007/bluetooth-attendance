@@ -1,8 +1,10 @@
 from btattendance import db, login_manager
 from werkzeug.security import generate_password_hash, check_password_hash
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from flask_login import UserMixin
 from datetime import datetime
 import enum
+import os
 
 
 @login_manager.user_loader
@@ -69,15 +71,31 @@ class Student(db.Model, UserMixin):
         self.name = name
         self.rollno = rollno
         self.email = email
-        self.password_hash = generate_password_hash(password)
+        self.password_hash = self.generate_password(password)
         self.bd_addr = bd_addr
         self.department_id = department.id
 
     def __repr__(self):
         return f"Student('{self.name}', '{self.rollno}', '{self.email}', '{self.bd_addr}', '{self.department_id}')"  # noqa
 
+    def generate_password(self, password):
+        return generate_password_hash(password)
+
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+    def get_reset_token(self, expires_sec=1800):
+        s = Serializer(os.environ.get('SECRET_KEY'), expires_sec)
+        return s.dumps({'user_id': self.id}).decode('utf-8')
+
+    @staticmethod
+    def verify_reset_token(token):
+        s = Serializer(os.environ.get('SECRET_KEY'))
+        try:
+            user_id = s.loads(token)['user_id']
+        except:
+            return None
+        return Student.query.get(user_id)
 
 
 class Teacher(db.Model):

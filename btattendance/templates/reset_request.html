@@ -1,0 +1,28 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<div class="jumbotron mt-3">
+  <h1 class="display-4 text-center">Request Password Reset</h1>
+  <div class="content-section mt-4 pt-4">
+    <form action="" , method="POST">
+      {{ form.hidden_tag() }}
+      <div class="form-group">
+        {{ form.email.label }}
+        {% if form.email.errors %}
+        {{ form.email(class="form-control form-control-lg is-invalid", placeholder="Enter email") }}
+        <div class="invalid-feedback">
+          {% for error in form.email.errors %}
+          <span>{{ error }}</span>
+          {% endfor %}
+        </div>
+        {% else %}
+        {{ form.email(class="form-control form-control-lg", placeholder="Enter email") }}
+        {% endif %}
+      </div>
+      <div class="text-center mx-2">
+        {{ form.submit(class="btn btn-outline-info") }}
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

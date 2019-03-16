@@ -1,16 +1,15 @@
 import os
 from PIL import Image
 from flask import (Blueprint, redirect, render_template,
-                   url_for, flash, session, request)
+                   url_for, flash, request)
 from flask_login import login_user, current_user, login_required, logout_user
-from btattendance.utils import is_logged_in
 from btattendance.students.forms import (RegistrationForm, LoginForm,
-                                         UpdateAccountForm)
+                                         UpdateAccountForm, RequestResetForm,
+                                         ResetPasswordForm)
 from btattendance.models import Student, Department, DeptCode
-from btattendance import db
+from btattendance import db, mail
 from secrets import token_hex
-
-
+from flask_mail import Message
 students = Blueprint('students', __name__)
 
 # Student Register
@@ -86,7 +85,7 @@ def save_picture(form_image):
 def account():
     form = UpdateAccountForm()
     image_file = url_for(
-        'static', filename='profile_pics/' + current_user.profile_img)
+        'static', filename='profile_students/' + current_user.profile_img)
     if form.validate_on_submit():
         if form.picture.data:
             image_file = save_picture(form.picture.data)
@@ -102,6 +101,7 @@ def account():
 
     return render_template('accountStu.html', form=form, image_file=image_file)
 
+
 # Logout
 @students.route('/logout')
 def logout():
@@ -110,3 +110,50 @@ def logout():
         flash('You are now logged out', category='info')
 
     return redirect(url_for('index'))
+
+
+def send_reset_mail(student):
+    token = student.get_reset_token()
+    msg = Message(subject='Password Reset Request!',
+                  sender='noreply@btattendance.com',
+                  recipients=[student.email],
+                  body=f'''To reset your password, visit the following link:
+{url_for('students.reset_password', token=token, _external=True)}
+
+If you didn't make this request then simply ignore this email and changes will be made!
+''')
+    mail.send(msg)
+
+
+@students.route('/reset_password', methods=['GET', 'POST'])
+def reset_request():
+    if current_user.is_authenticated:
+        return redirect(url_for('students.dashboard'))
+    form = RequestResetForm()
+    if form.validate_on_submit():
+        student = Student.query.filter_by(email=form.email.data).first()
+        send_reset_mail(student)
+        flash('An email has been sent with the instructions to reset your password!', 'warning')
+        return redirect(url_for('students.login'))
+
+    return render_template('reset_request.html', title='Reset Password',
+                           form=form)
+
+
+@students.route('/reset_password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    if current_user.is_authenticated:
+        return redirect(url_for('students.dashboard'))
+    student = Student.verify_reset_token(token)
+    if student is None:
+        flash('The token is invalid or expired!', 'warning')
+        return redirect(url_for('students.reset_request'))
+    form = ResetPasswordForm()
+    if form.validate_on_submit():
+        student.password_hash = student.generate_password(form.password.data)
+        db.session.commit()
+        flash("Your password has been reset successfully! Please Login")
+        return redirect(url_for('students.login'))
+
+    return render_template('reset_password.html', title='Reset Password',
+                           form=form)

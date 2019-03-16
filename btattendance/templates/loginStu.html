@@ -4,48 +4,45 @@
 <div class="jumbotron mt-3">
   <h1 class="display-4 text-center">Login For Students</h1>
   <div class="content-section">
-    <form action="", method="POST">
-        {{ form.hidden_tag() }}
+    <form action="" , method="POST">
+      {{ form.hidden_tag() }}
       <div class="form-group">
         {{ form.email.label }}
         {% if form.email.errors %}
-          {{ form.email(class="form-control form-control-lg is-invalid", placeholder="Enter email") }}
-          <div class="invalid-feedback">
-            {% for error in form.email.errors %}
-              <span>{{ error }}</span>
-            {% endfor %}
-          </div>
+        {{ form.email(class="form-control form-control-lg is-invalid", placeholder="Enter email") }}
+        <div class="invalid-feedback">
+          {% for error in form.email.errors %}
+          <span>{{ error }}</span>
+          {% endfor %}
+        </div>
         {% else %}
-          {{ form.email(class="form-control form-control-lg", placeholder="Enter email") }}  
+        {{ form.email(class="form-control form-control-lg", placeholder="Enter email") }}
         {% endif %}
       </div>
       <div class="form-group">
         {{ form.password.label }}
         {% if form.password.errors %}
-          {{ form.password(class="form-control form-control-lg is-invalid", placeholder="Enter password") }}
-          <div class="invalid-feedback">
-            {% for error in form.password.errors %}
-              <span>{{ error }}</span>
-            {% endfor %}
-          </div>
+        {{ form.password(class="form-control form-control-lg is-invalid", placeholder="Enter password") }}
+        <div class="invalid-feedback">
+          {% for error in form.password.errors %}
+          <span>{{ error }}</span>
+          {% endfor %}
+        </div>
         {% else %}
-          {{ form.password(class="form-control form-control-lg", placeholder="Enter password") }}  
+        {{ form.password(class="form-control form-control-lg", placeholder="Enter password") }}
         {% endif %}
       </div>
       <div class="form-group form-check">
         {{ form.remember(class="form-check-input") }}
         {{ form.remember.label }}
       </div>
-      <div class="text-center">
+      <div>
         {{ form.submit(class="btn btn-outline-info") }}
+        <small class="text-muted">
+          <a class="ml-1" href="{{ url_for('students.reset_request') }}">Forgot Password?</a>
+        </small>
       </div>
-      
     </form>
   </div>
-  <div class="pt-3 text-center">
-    <small class="text-muted">
-      <a class="ml-1" href="{{ url_for('students.login') }}">Forgot Password</a>
-    </small>
-  </div>
-</div>  
+</div>
 {% endblock %}

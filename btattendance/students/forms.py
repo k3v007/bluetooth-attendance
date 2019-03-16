@@ -85,3 +85,27 @@ class UpdateAccountForm(FlaskForm):
             if Student.query.filter_by(bd_addr=bd_addr.data).first():
                 raise ValidationError(
                     "Bluetooth Address already registered with us!")
+
+
+class RequestResetForm(FlaskForm):
+    email = StringField('Email', validators=[
+        Email(),
+        DataRequired()
+    ])
+    submit = SubmitField('Submit')
+
+    def validate_email(self, email):
+        if Student.query.filter_by(email=email.data).first() is None:
+            raise ValidationError("This e-mail is not registered with us!")
+
+
+class ResetPasswordForm(FlaskForm):
+    password = PasswordField('Password', validators=[
+        DataRequired(),
+        Length(min=4, max=50)
+    ])
+    confirm_password = PasswordField('Confirm Password', validators=[
+        DataRequired(),
+        EqualTo('password', message='Passwords did not match!')
+    ])
+    submit = SubmitField('Reset Password')
