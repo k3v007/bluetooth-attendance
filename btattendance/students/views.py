@@ -1,16 +1,19 @@
 import os
-from PIL import Image
-from flask import (Blueprint, redirect, render_template,
-                   url_for, flash, request)
-from flask_login import login_user, current_user, login_required, logout_user
-from btattendance.students.forms import (RegistrationForm, LoginForm,
-                                         UpdateAccountForm, RequestResetForm,
-                                         ResetPasswordForm)
-from btattendance.models import Student, Department, DeptCode
-from btattendance import db, mail
 from secrets import token_hex
+
+from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask_login import current_user, login_required, login_user, logout_user
 from flask_mail import Message
+from PIL import Image
+
+from btattendance import db, mail
+from btattendance.models import Department, DeptCode, Student
+from btattendance.students.forms import (LoginForm, RegistrationForm,
+                                         RequestResetForm, ResetPasswordForm,
+                                         UpdateAccountForm)
+
 students = Blueprint('students', __name__)
+
 
 # Student Register
 @students.route('/register', methods=['GET', 'POST'])
