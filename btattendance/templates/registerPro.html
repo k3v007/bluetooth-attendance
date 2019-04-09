@@ -33,6 +33,19 @@
         {% endif %}
       </div>
       <div class="form-group">
+        {{ form.department.label }}
+        {% if form.department.errors %}
+        {{ form.department(class="form-control form-control-lg is-invalid") }}
+        <div class="invalid-feedback">
+          {% for error in form.department.errors %}
+          <span>{{ error }}</span>
+          {% endfor %}
+        </div>
+        {% else %}
+        {{ form.department(class="form-control form-control-lg") }}
+        {% endif %}
+      </div>
+      <div class="form-group">
         {{ form.password.label }}
         {% if form.password.errors %}
           {{ form.password(class="form-control form-control-lg is-invalid", placeholder="Enter Password") }}

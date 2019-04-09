@@ -100,7 +100,7 @@ class Student(db.Model, UserMixin):
         return Student.query.get(user_id)
 
 
-class Teacher(db.Model):
+class Teacher(db.Model, UserMixin):
     __tablename__ = 'teachers'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)

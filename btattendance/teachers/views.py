@@ -8,7 +8,9 @@ from PIL import Image
 
 from btattendance import db, mail
 from btattendance.models import Department, DeptCode, Teacher
-from btattendance.teachers.forms import LoginForm, RegistrationForm
+from btattendance.teachers.forms import (LoginForm, RegistrationForm,
+                                         RequestResetForm, ResetPasswordForm,
+                                         UpdateAccountForm)
 
 teachers = Blueprint('teachers', __name__)
 
