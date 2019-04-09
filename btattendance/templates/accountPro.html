@@ -1,0 +1,42 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<div class="content-section jumbotron bg-light mt-3 border round">
+  <div class="media">
+    <img class="rounded-circle account-img" src="{{ image_file }}">
+    <div class="media-body pt-2 mt-3 ml-3">
+      <h2 class="account-heading">{{ current_user.name }}</h2>
+      <p class="text-secondary ml-1">{{ current_user.email }}</p>
+    </div>
+  </div>
+  <form action="" , method="POST" , enctype="multipart/form-data">
+    {{ form.hidden_tag() }}
+    <div class="form-group mt-4">
+      {{ form.name.label }}
+      {% if form.name.errors %}
+      {{ form.name(class="form-control form-control-lg is-invalid", placeholder="Enter Name") }}
+      <div class="invalid-feedback">
+        {% for error in form.name.errors %}
+        <span>{{ error }}</span>
+        {% endfor %}
+      </div>
+      {% else %}
+      {{ form.name(class="form-control form-control-lg", placeholder="Enter Name") }}
+      {% endif %}
+    </div>
+    <div class="form-group">
+      {{ form.picture.label }}
+      {{ form.picture(class="form-control-file") }}
+      {% if form.picture.errors %}
+      {% for error in form.picture.errors %}
+      <span class="text-danger">{{ error }}</span><br>
+      {% endfor %}
+      {% endif %}
+    </div>
+    <br>
+    <div class="text-center">
+      {{ form.submit(class="btn btn-outline-info") }}
+    </div>
+  </form>
+</div>
+{% endblock %}
