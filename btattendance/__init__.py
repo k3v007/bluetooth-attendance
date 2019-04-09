@@ -1,32 +1,37 @@
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager
-from btattendance.config import Config
-from flask_mail import Mail
-from flask_migrate import Migrate
+import os
 
+from dotenv import load_dotenv
+load_dotenv('.env')
 
+from flask import Flask     # noqa
+from flask_admin import Admin   # noqa
+from flask_login import LoginManager    # noqa
+from flask_mail import Mail     # noqa
+from flask_sqlalchemy import SQLAlchemy     # noqa
+
+admin = Admin()
 db = SQLAlchemy()
 login_manager = LoginManager()
 mail = Mail()
-migrate = Migrate()
 
 
-def create_app(config_class=Config):
+def create_app():
     app = Flask(__name__)
-    app.config.from_object(config_class)
+    app.config.from_object(os.environ['APP_SETTINGS'])
 
+    admin.init_app(app)
     db.init_app(app)
     login_manager.init_app(app)
     mail.init_app(app)
-    migrate.init_app(app, db)
-    
+
     login_manager.login_view = 'students.login'
     login_manager.login_message_category = 'warning'
 
     from btattendance.students.views import students  # noqa
     from btattendance.teachers.views import teachers  # noqa
+    from btattendance.users.views import users
     app.register_blueprint(students, url_prefix='/student')
     app.register_blueprint(teachers, url_prefix='/teacher')
+    app.register_blueprint(users)
 
     return app
