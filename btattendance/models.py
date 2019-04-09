@@ -1,10 +1,12 @@
-from btattendance import db, login_manager
-from werkzeug.security import generate_password_hash, check_password_hash
-from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
-from flask_login import UserMixin
-from datetime import datetime
 import enum
 import os
+from datetime import datetime
+
+from flask_login import UserMixin
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+from werkzeug.security import check_password_hash, generate_password_hash
+
+from btattendance import db, login_manager
 
 
 @login_manager.user_loader

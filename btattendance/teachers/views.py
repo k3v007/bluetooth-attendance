@@ -1,7 +1,7 @@
-from flask import (Blueprint, redirect, render_template,
-                   url_for, flash, session)
+from flask import Blueprint, flash, redirect, render_template, session, url_for
+
+from btattendance.teachers.forms import LoginForm, RegistrationForm
 from btattendance.utils import is_logged_in
-from btattendance.teachers.forms import RegistrationForm, LoginForm
 
 teachers = Blueprint('teachers', __name__)
 
