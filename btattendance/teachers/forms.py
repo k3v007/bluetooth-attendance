@@ -28,6 +28,10 @@ class RegistrationForm(FlaskForm):
     ])
     submit = SubmitField('Sign Up')
 
+    def validate_email(self, email):
+        if Teacher.query.filter_by(email=email.data).first():
+            raise ValidationError("This e-mail is already registered with us!")
+
 
 class LoginForm(FlaskForm):
     email = StringField('Email', validators=[

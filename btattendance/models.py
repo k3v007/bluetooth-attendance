@@ -122,6 +122,19 @@ class Teacher(db.Model, UserMixin):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
+    def get_reset_token(self, expires_sec=1800):
+        s = Serializer(os.environ.get('SECRET_KEY'), expires_sec)
+        return s.dumps({'user_id': self.id}).decode('utf-8')
+
+    @staticmethod
+    def verify_reset_token(token):
+        s = Serializer(os.environ.get('SECRET_KEY'))
+        try:
+            user_id = s.loads(token)['user_id']
+        except:
+            return None
+        return Student.query.get(user_id)
+
 
 class Course(db.Model):
     __tablename__ = 'courses'
