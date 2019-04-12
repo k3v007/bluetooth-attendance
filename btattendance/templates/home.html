@@ -6,11 +6,8 @@
     <p></p>
     <p class="lead">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Dolorem doloremque voluptatum molestiae animi accusantium, quam dignissimos aliquam optio! Veritatis, distinctio. Possimus, beatae? Inventore, nostrum. Quod optio ut aut perferendis aliquid!</p>
     {% if session.logged_in == NULL %}
-      <a href="{{ url_for('teachers.register') }}" class="btn btn-primary btn-lg">Teacher Register</a>
-      <a href="{{ url_for('users.login') }}" class="btn btn-success btn-lg">Teacher Login</a>
-      <a href="{{ url_for('students.register') }}" class="btn btn-primary btn-lg">Student Register</a>
-      <a href="{{ url_for('users.login') }}" class="btn btn-success btn-lg">Student Login</a>
-
+      <a href="{{ url_for('users.login') }}" class="btn btn-success btn-lg">Login</a>
+      <a href="{{ url_for('students.register') }}" class="btn btn-primary btn-lg">Register</a>
     {% endif %}
   </div>
 {% endblock %}
