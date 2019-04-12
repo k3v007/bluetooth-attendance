@@ -114,15 +114,17 @@ class Student(User):
         return f"Student('{self.name}', '{self.rollno}', '{self.email}', '{self.bd_addr}', '{self.department_id}')"  # noqa
 
 
-class Teacher(db.Model, UserMixin):
+class Teacher(User):
     __tablename__ = 'teachers'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), nullable=False)
-    email = db.Column(db.String(50), nullable=False, unique=True)
-    password_hash = db.Column(db.String(100), nullable=False)
+    id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
+    profile_img = db.Column(db.String(50), nullable=False,
+                            default='default.jpg')
     sections = db.relationship('Section', backref='teacher', lazy=True)
     department_id = db.Column(db.Integer, db.ForeignKey(
         'departments.id'), nullable=False)
+    __mapper_args__ = {
+        'polymorphic_identity': 'teachers',
+    }
 
     def __init__(self, name, email, password, department):
         self.name = name
