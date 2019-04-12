@@ -8,9 +8,8 @@ from PIL import Image
 
 from btattendance import db, mail
 from btattendance.models import Department, DeptCode, Teacher
-from btattendance.teachers.forms import (LoginForm, RegistrationForm,
-                                         RequestResetForm, ResetPasswordForm,
-                                         UpdateAccountForm)
+from btattendance.users.teachers.forms import (RegistrationForm,
+                                               UpdateAccountForm)
 
 teachers = Blueprint('teachers', __name__)
 
@@ -31,26 +30,6 @@ def register():
         flash('Account created successfully! Please Log In.', 'success')
         return redirect(url_for('teachers.login'))
     return render_template('registerPro.html', form=form, title='Register')
-
-
-# Teacher login
-@teachers.route('/login', methods=['GET', 'POST'])
-def login():
-    if current_user.is_authenticated:
-        return redirect(url_for('teachers.dashboard'))
-    form = LoginForm()
-    if form.validate_on_submit():
-        user = Teacher.query.filter_by(email=form.email.data).first()
-        if user and user.check_password(form.password.data):
-            login_user(user, remember=form.remember.data)
-            next_page = request.args.get('next')
-            flash(f'Welcome {user.name}!', 'success')
-            return redirect(next_page) if next_page else redirect(
-                url_for('teachers.dashboard')
-            )
-        else:
-            flash(f'Invalid username or password!', category='danger')
-    return render_template('loginPro.html', form=form, title='Login')
 
 
 # Teacher dashboard
@@ -132,60 +111,3 @@ def account():
         form.name.data = current_user.name
 
     return render_template('accountPro.html', form=form, image_file=image_file)
-
-
-# Logout
-@teachers.route('/logout')
-def logout():
-    if current_user.is_authenticated:
-        logout_user()
-        flash('You are now logged out', category='info')
-
-    return redirect(url_for('index'))
-
-
-def send_reset_mail(teacher):
-    token = teacher.get_reset_token()
-    msg = Message(subject='Password Reset Request!',
-                  sender='noreply@btattendance.com',
-                  recipients=[teacher.email],
-                  body=f'''To reset your password, visit the following link:
-{url_for('teachers.reset_password', token=token, _external=True)}
-
-If you didn't make this request then simply ignore this email and changes will be made!
-''')
-    mail.send(msg)
-
-
-@teachers.route('/reset_password', methods=['GET', 'POST'])
-def reset_request():
-    if current_user.is_authenticated:
-        return redirect(url_for('teachers.dashboard'))
-    form = RequestResetForm()
-    if form.validate_on_submit():
-        teacher = Teacher.query.filter_by(email=form.email.data).first()
-        send_reset_mail(teacher)
-        flash('An email has been sent with the instructions to reset your password!', 'warning')
-        return redirect(url_for('teachers.login'))
-
-    return render_template('reset_request.html', title='Reset Password',
-                           form=form)
-
-
-@teachers.route('/reset_password/<token>', methods=['GET', 'POST'])
-def reset_password(token):
-    if current_user.is_authenticated:
-        return redirect(url_for('teachers.dashboard'))
-    teacher = Teacher.verify_reset_token(token)
-    if teacher is None:
-        flash('The token is invalid or expired!', 'warning')
-        return redirect(url_for('teachers.reset_request'))
-    form = ResetPasswordForm()
-    if form.validate_on_submit():
-        teacher.password_hash = teacher.generate_password(form.password.data)
-        db.session.commit()
-        flash("Your password has been reset successfully! Please Login")
-        return redirect(url_for('teachers.login'))
-
-    return render_template('reset_password.html', title='Reset Password',
-                           form=form)

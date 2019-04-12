@@ -11,7 +11,7 @@ from btattendance import db, login_manager
 
 @login_manager.user_loader
 def load_user(user_id):
-    return Student.query.get(int(user_id))
+    return User.query.get(int(user_id))
 
 
 class DeptCode(enum.Enum):
@@ -50,35 +50,18 @@ registration = db.Table('registration_info',
                         )
 
 
-class Student(db.Model, UserMixin):
-    __tablename__ = 'students'
+class User(db.Model, UserMixin):
+    __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
-    rollno = db.Column(db.String(7), nullable=False, unique=True)
     email = db.Column(db.String(80), nullable=False, unique=True)
-    profile_img = db.Column(
-        db.String(50), nullable=False, default='default.jpg')
     password_hash = db.Column(db.String(100), nullable=False)
-    bd_addr = db.Column(db.String(90), nullable=False, unique=True)
-    department_id = db.Column(db.Integer, db.ForeignKey(
-        'departments.id'), nullable=False)
-    attendance = db.relationship('Attendance', backref='student', lazy=True)
-    registration_info = db.relationship('Section', secondary=registration,
-                                        lazy='subquery',
-                                        backref=db.backref(
-                                            'department', lazy=True)
-                                        )
-
-    def __init__(self, name, rollno, email, password, bd_addr, department):
-        self.name = name
-        self.rollno = rollno
-        self.email = email
-        self.password_hash = self.generate_password(password)
-        self.bd_addr = bd_addr
-        self.department_id = department.id
-
-    def __repr__(self):
-        return f"Student('{self.name}', '{self.rollno}', '{self.email}', '{self.bd_addr}', '{self.department_id}')"  # noqa
+    active = db.Column(db.Boolean, nullable=False, default=True)
+    type = db.Column(db.String(20), default="user")
+    __mapper_args__ = {
+        'polymorphic_identity': 'users',
+        'polymorphic_on': type
+    }
 
     def generate_password(self, password):
         return generate_password_hash(password)
@@ -90,14 +73,45 @@ class Student(db.Model, UserMixin):
         s = Serializer(os.environ.get('SECRET_KEY'), expires_sec)
         return s.dumps({'user_id': self.id}).decode('utf-8')
 
-    @staticmethod
-    def verify_reset_token(token):
+    @classmethod
+    def verify_reset_token(cls, token):
         s = Serializer(os.environ.get('SECRET_KEY'))
         try:
             user_id = s.loads(token)['user_id']
-        except:
+        except:     # noqa
             return None
-        return Student.query.get(user_id)
+        return cls.query.get(user_id)
+
+
+class Student(User):
+    __tablename__ = 'students'
+    id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
+    rollno = db.Column(db.String(7), nullable=False, unique=True)
+    profile_img = db.Column(db.String(50), nullable=False,
+                            default='default.jpg')
+    bd_addr = db.Column(db.String(90), nullable=False, unique=True)
+    department_id = db.Column(db.Integer, db.ForeignKey(
+                             'departments.id'), nullable=False)
+    attendance = db.relationship('Attendance', backref='student', lazy=True)
+    registration_info = db.relationship('Section', secondary=registration,
+                                        lazy='subquery',
+                                        backref=db.backref(
+                                            'department', lazy=True)
+                                        )
+    __mapper_args__ = {
+        'polymorphic_identity': 'students',
+    }
+
+    def __init__(self, name, rollno, email, password, bd_addr, department):
+        self.name = name
+        self.rollno = rollno
+        self.email = email
+        self.password_hash = self.generate_password(password)
+        self.bd_addr = bd_addr
+        self.department_id = department.id
+
+    def __repr__(self):
+        return f"Student('{self.name}', '{self.rollno}', '{self.email}', '{self.bd_addr}', '{self.department_id}')"  # noqa
 
 
 class Teacher(db.Model, UserMixin):
@@ -118,22 +132,6 @@ class Teacher(db.Model, UserMixin):
 
     def __repr__(self):
         return f"Teacher('{self.name}', '{self.email}', '{self.department_id}')"  # noqa
-
-    def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
-
-    def get_reset_token(self, expires_sec=1800):
-        s = Serializer(os.environ.get('SECRET_KEY'), expires_sec)
-        return s.dumps({'user_id': self.id}).decode('utf-8')
-
-    @staticmethod
-    def verify_reset_token(token):
-        s = Serializer(os.environ.get('SECRET_KEY'))
-        try:
-            user_id = s.loads(token)['user_id']
-        except:
-            return None
-        return Student.query.get(user_id)
 
 
 class Course(db.Model):

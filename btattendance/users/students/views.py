@@ -2,15 +2,16 @@ import os
 from secrets import token_hex
 
 from flask import Blueprint, flash, redirect, render_template, request, url_for
-from flask_login import current_user, login_required, login_user, logout_user
+from flask_login import current_user, login_required
 from flask_mail import Message
 from PIL import Image
 
 from btattendance import db, mail
 from btattendance.models import Department, DeptCode, Student
-from btattendance.students.forms import (LoginForm, RegistrationForm,
-                                         RequestResetForm, ResetPasswordForm,
-                                         UpdateAccountForm)
+from btattendance.users.students.forms import (RegistrationForm,
+                                               RequestResetForm,
+                                               ResetPasswordForm,
+                                               UpdateAccountForm)
 
 students = Blueprint('students', __name__)
 
@@ -33,24 +34,6 @@ def register():
         flash('Account created successfully! Please Log In.', 'success')
         return redirect(url_for('students.login'))
     return render_template('registerStu.html', form=form, title='Register')
-
-
-# Student login
-@students.route('/login', methods=['GET', 'POST'])
-def login():
-    if current_user.is_authenticated:
-        return redirect(url_for('students.dashboard'))
-    form = LoginForm()
-    if form.validate_on_submit():
-        user = Student.query.filter_by(email=form.email.data).first()
-        if user and user.check_password(form.password.data):
-            login_user(user, remember=form.remember.data)
-            next_page = request.args.get('next')
-            flash(f'Welcome {user.name}!', 'success')
-            return redirect(next_page) if next_page else redirect(url_for('students.dashboard'))
-        else:
-            flash(f'Invalid username or password!', category='danger')
-    return render_template('loginStu.html', form=form, title='Login')
 
 
 # Student dashboard
@@ -103,16 +86,6 @@ def account():
         form.bd_addr.data = current_user.bd_addr
 
     return render_template('accountStu.html', form=form, image_file=image_file)
-
-
-# Logout
-@students.route('/logout')
-def logout():
-    if current_user.is_authenticated:
-        logout_user()
-        flash('You are now logged out', category='info')
-
-    return redirect(url_for('index'))
 
 
 def send_reset_mail(student):
