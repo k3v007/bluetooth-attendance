@@ -1,13 +1,13 @@
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_admin.contrib.sqla import ModelView
-from flask_login import current_user, login_user, logout_user
-from flask_mail import Message
+from flask_login import current_user, login_required, login_user, logout_user
 
-from btattendance import admin, db, mail
+from btattendance import admin, db
 from btattendance.models import (Attendance, Course, Department, Section,
                                  Student, Teacher, User)
 from btattendance.users.forms import (LoginForm, RequestResetForm,
                                       ResetPasswordForm)
+from btattendance.utils import send_reset_mail
 
 users = Blueprint("users", __name__)
 
@@ -16,11 +16,7 @@ users = Blueprint("users", __name__)
 @users.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        user_type = current_user.type
-        if user_type == "student":
-            return redirect(url_for('students.dashboard'))
-        else:
-            return redirect(url_for('teachers.dashboard'))
+        return redirect(url_for('users.dashboard'))
 
     form = LoginForm()
     if form.validate_on_submit():
@@ -30,15 +26,10 @@ def login():
             login_user(user, remember=form.remember.data)
             next_page = request.args.get('next')
             flash(f'Welcome {user.name}!', 'success')
-
             if next_page:
-                print(next_page)
                 return redirect(next_page)
             else:
-                if user_type == "students":
-                    return redirect(url_for("students.dashboard"))
-                else:
-                    return redirect(url_for("teachers.dashboard"))
+                return redirect(url_for("users.dashboard"))
         else:
             flash(f'Invalid username or password!', category='danger')
 
@@ -55,48 +46,47 @@ def logout():
     return redirect(url_for('index'))
 
 
-def send_reset_mail(teacher):
-    token = teacher.get_reset_token()
-    msg = Message(subject='Password Reset Request!',
-                  sender='noreply@btattendance.com',
-                  recipients=[teacher.email],
-                  body=f'''To reset your password, visit the following link:
-{url_for('teachers.reset_password', token=token, _external=True)}
-
-If you didn't make this request then simply ignore this email and changes will be made!
-''')
-    mail.send(msg)
+# User dashboard
+@users.route('/dashboard')
+@login_required
+def dashboard():
+    if current_user.type == "students":
+        return render_template('dashboardStu.html')
+    else:
+        return render_template('dashboardPro.html')
 
 
+# Request password reset
 @users.route('/reset_password', methods=['GET', 'POST'])
 def reset_request():
     if current_user.is_authenticated:
-        return redirect(url_for('students.dashboard'))
+        return redirect(url_for('users.dashboard'))
     form = RequestResetForm()
     if form.validate_on_submit():
-        teacher = Teacher.query.filter_by(email=form.email.data).first()
-        send_reset_mail(teacher)
+        user = User.query.filter_by(email=form.email.data).first()
+        send_reset_mail(user)
         flash('An email has been sent with the instructions to reset your password!', 'warning')
-        return redirect(url_for('teachers.login'))
+        return redirect(url_for('users.login'))
 
     return render_template('reset_request.html', title='Reset Password',
                            form=form)
 
 
+# Reset password
 @users.route('/reset_password/<token>', methods=['GET', 'POST'])
 def reset_password(token):
     if current_user.is_authenticated:
-        return redirect(url_for('teachers.dashboard'))
-    teacher = Teacher.verify_reset_token(token)
-    if teacher is None:
+        return redirect(url_for('users.dashboard'))
+    user = User.verify_reset_token(token)
+    if user is None:
         flash('The token is invalid or expired!', 'warning')
-        return redirect(url_for('teachers.reset_request'))
+        return redirect(url_for('users.reset_request'))
     form = ResetPasswordForm()
     if form.validate_on_submit():
-        teacher.password_hash = teacher.generate_password(form.password.data)
+        user.password_hash = user.generate_password(form.password.data)
         db.session.commit()
         flash("Your password has been reset successfully! Please Login")
-        return redirect(url_for('teachers.login'))
+        return redirect(url_for('users.login'))
 
     return render_template('reset_password.html', title='Reset Password',
                            form=form)

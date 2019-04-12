@@ -3,14 +3,11 @@ from secrets import token_hex
 
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
-from flask_mail import Message
 from PIL import Image
 
-from btattendance import db, mail
+from btattendance import db
 from btattendance.models import Department, DeptCode, Student
 from btattendance.users.students.forms import (RegistrationForm,
-                                               RequestResetForm,
-                                               ResetPasswordForm,
                                                UpdateAccountForm)
 
 students = Blueprint('students', __name__)
@@ -20,7 +17,7 @@ students = Blueprint('students', __name__)
 @students.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
-        return redirect(url_for('students.dashboard'))
+        return redirect(url_for('users.dashboard'))
     form = RegistrationForm()
     if form.validate_on_submit():
         dept = Department.query.filter_by(
@@ -34,13 +31,6 @@ def register():
         flash('Account created successfully! Please Log In.', 'success')
         return redirect(url_for('users.login'))
     return render_template('registerStu.html', form=form, title='Register')
-
-
-# Student dashboard
-@students.route('/dashboard')
-@login_required
-def dashboard():
-    return render_template('dashboardStu.html')
 
 
 # here's some caching issue if image is saved with the same file name as
@@ -69,6 +59,9 @@ def save_picture(form_image):
 @students.route('/account', methods=['GET', 'POST'])
 @login_required
 def account():
+    user_type = current_user.type
+    if user_type != "students":
+        return redirect(url_for(f'{user_type}.account'))
     form = UpdateAccountForm()
     image_file = url_for(
         'static', filename='profile_students/' + current_user.profile_img)
@@ -86,50 +79,3 @@ def account():
         form.bd_addr.data = current_user.bd_addr
 
     return render_template('accountStu.html', form=form, image_file=image_file)
-
-
-def send_reset_mail(student):
-    token = student.get_reset_token()
-    msg = Message(subject='Password Reset Request!',
-                  sender='noreply@btattendance.com',
-                  recipients=[student.email],
-                  body=f'''To reset your password, visit the following link:
-{url_for('students.reset_password', token=token, _external=True)}
-
-If you didn't make this request then simply ignore this email and changes will be made!
-''')
-    mail.send(msg)
-
-
-@students.route('/reset_password', methods=['GET', 'POST'])
-def reset_request():
-    if current_user.is_authenticated:
-        return redirect(url_for('students.dashboard'))
-    form = RequestResetForm()
-    if form.validate_on_submit():
-        student = Student.query.filter_by(email=form.email.data).first()
-        send_reset_mail(student)
-        flash('An email has been sent with the instructions to reset your password!', 'warning')
-        return redirect(url_for('users.login'))
-
-    return render_template('reset_request.html', title='Reset Password',
-                           form=form)
-
-
-@students.route('/reset_password/<token>', methods=['GET', 'POST'])
-def reset_password(token):
-    if current_user.is_authenticated:
-        return redirect(url_for('students.dashboard'))
-    student = Student.verify_reset_token(token)
-    if student is None:
-        flash('The token is invalid or expired!', 'warning')
-        return redirect(url_for('students.reset_request'))
-    form = ResetPasswordForm()
-    if form.validate_on_submit():
-        student.password_hash = student.generate_password(form.password.data)
-        db.session.commit()
-        flash("Your password has been reset successfully! Please Login")
-        return redirect(url_for('users.login'))
-
-    return render_template('reset_password.html', title='Reset Password',
-                           form=form)

@@ -2,11 +2,10 @@ import os
 from secrets import token_hex
 
 from flask import Blueprint, flash, redirect, render_template, request, url_for
-from flask_login import current_user, login_required, login_user, logout_user
-from flask_mail import Message
+from flask_login import current_user, login_required
 from PIL import Image
 
-from btattendance import db, mail
+from btattendance import db
 from btattendance.models import Department, DeptCode, Teacher
 from btattendance.users.teachers.forms import (RegistrationForm,
                                                UpdateAccountForm)
@@ -18,7 +17,7 @@ teachers = Blueprint('teachers', __name__)
 @teachers.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
-        return redirect(url_for('teachers.dashboard'))
+        return redirect(url_for('users.dashboard'))
     form = RegistrationForm()
     if form.validate_on_submit():
         dept = Department.query.filter_by(
@@ -28,15 +27,8 @@ def register():
         db.session.add(teacher)
         db.session.commit()
         flash('Account created successfully! Please Log In.', 'success')
-        return redirect(url_for('teachers.login'))
+        return redirect(url_for('users.login'))
     return render_template('registerPro.html', form=form, title='Register')
-
-
-# Teacher dashboard
-@teachers.route('/dashboard')
-@login_required
-def dashboard():
-    return render_template('dashboardPro.html')
 
 
 # # Check Attendance
@@ -67,7 +59,7 @@ def dashboard():
 #     # DB task
 #     flash('Attendance Deleted', 'success')
 
-#     return redirect(url_for('teachers.dashboard'))
+#     return redirect(url_for('users.dashboard'))
 
 
 # here's some caching issue if image is saved with the same file name as
@@ -96,6 +88,9 @@ def save_picture(form_image):
 @teachers.route('/account', methods=['GET', 'POST'])
 @login_required
 def account():
+    user_type = current_user.type
+    if user_type != "teachers":
+        return redirect(url_for(f'{user_type}.account'))
     form = UpdateAccountForm()
     image_file = url_for(
         'static', filename='profile_teachers/' + current_user.profile_img)
