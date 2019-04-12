@@ -24,7 +24,7 @@ def create_app():
     login_manager.init_app(app)
     mail.init_app(app)
 
-    login_manager.login_view = 'students.login'
+    login_manager.login_view = 'users.login'
     login_manager.login_message_category = 'warning'
 
     from btattendance.users.students.views import students  # noqa

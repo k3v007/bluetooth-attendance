@@ -5,35 +5,47 @@ from flask_mail import Message
 
 from btattendance import admin, db, mail
 from btattendance.models import (Attendance, Course, Department, Section,
-                                 Student, Teacher)
+                                 Student, Teacher, User)
 from btattendance.users.forms import (LoginForm, RequestResetForm,
                                       ResetPasswordForm)
 
 users = Blueprint("users", __name__)
 
 
-# Student login
+# User login
 @users.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        if current_user.type == "student":
+        user_type = current_user.type
+        if user_type == "student":
             return redirect(url_for('students.dashboard'))
         else:
             return redirect(url_for('teachers.dashboard'))
+
     form = LoginForm()
     if form.validate_on_submit():
-        user = Student.query.filter_by(email=form.email.data).first()
+        user = User.query.filter_by(email=form.email.data).first()
+
         if user and user.check_password(form.password.data):
             login_user(user, remember=form.remember.data)
             next_page = request.args.get('next')
             flash(f'Welcome {user.name}!', 'success')
-            return redirect(next_page) if next_page else redirect(url_for('students.dashboard'))
+
+            if next_page:
+                print(next_page)
+                return redirect(next_page)
+            else:
+                if user_type == "students":
+                    return redirect(url_for("students.dashboard"))
+                else:
+                    return redirect(url_for("teachers.dashboard"))
         else:
             flash(f'Invalid username or password!', category='danger')
+
     return render_template('login.html', form=form, title='Login')
 
 
-# Logout
+# User Logout
 @users.route('/logout')
 def logout():
     if current_user.is_authenticated:

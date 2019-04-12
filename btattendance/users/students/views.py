@@ -32,7 +32,7 @@ def register():
         db.session.add(student)
         db.session.commit()
         flash('Account created successfully! Please Log In.', 'success')
-        return redirect(url_for('students.login'))
+        return redirect(url_for('users.login'))
     return render_template('registerStu.html', form=form, title='Register')
 
 
@@ -110,7 +110,7 @@ def reset_request():
         student = Student.query.filter_by(email=form.email.data).first()
         send_reset_mail(student)
         flash('An email has been sent with the instructions to reset your password!', 'warning')
-        return redirect(url_for('students.login'))
+        return redirect(url_for('users.login'))
 
     return render_template('reset_request.html', title='Reset Password',
                            form=form)
@@ -129,7 +129,7 @@ def reset_password(token):
         student.password_hash = student.generate_password(form.password.data)
         db.session.commit()
         flash("Your password has been reset successfully! Please Login")
-        return redirect(url_for('students.login'))
+        return redirect(url_for('users.login'))
 
     return render_template('reset_password.html', title='Reset Password',
                            form=form)
