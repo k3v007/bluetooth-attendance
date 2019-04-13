@@ -1,8 +1,7 @@
 from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager
 
-from btattendance import create_app, db
-
+from app import create_app, db
 
 app = create_app()
 

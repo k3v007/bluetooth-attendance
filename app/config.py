@@ -13,7 +13,7 @@ class Config:
     MAIL_USE_TLS = True
     MAIL_USERNAME = os.environ['EMAIL_USER']
     MAIL_PASSWORD = os.environ['EMAIL_PASS']
-    FLASKY_MAIL_SENDER = 'noreply@btattendance.com'
+    FLASKY_MAIL_SENDER = 'noreply@bluetooth_attendance.com'
     # Database settings
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     # Redis Settings

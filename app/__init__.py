@@ -27,9 +27,9 @@ def create_app():
     login_manager.login_view = 'users.login'
     login_manager.login_message_category = 'warning'
 
-    from btattendance.users.students.views import students  # noqa
-    from btattendance.users.teachers.views import teachers  # noqa
-    from btattendance.users.views import users
+    from app.users.students.views import students  # noqa
+    from app.users.teachers.views import teachers  # noqa
+    from app.users.views import users
     app.register_blueprint(students, url_prefix='/student')
     app.register_blueprint(teachers, url_prefix='/teacher')
     app.register_blueprint(users)

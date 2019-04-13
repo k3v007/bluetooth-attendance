@@ -5,10 +5,10 @@ from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 from PIL import Image
 
-from btattendance import db
-from btattendance.models import Department, DeptCode, Student
-from btattendance.users.students.forms import (RegistrationForm,
-                                               UpdateAccountForm)
+from app import db
+from app.models import Department, DeptCode, Student
+from app.users.students.forms import RegistrationForm, UpdateAccountForm
+
 
 students = Blueprint('students', __name__)
 

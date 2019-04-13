@@ -6,7 +6,7 @@ from flask_login import UserMixin
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from btattendance import db, login_manager
+from app import db, login_manager
 
 
 @login_manager.user_loader

@@ -9,8 +9,8 @@
 /migrations
 
 # Profile images
-btattendance/static/profile_students
-btattendance/static/profile_teachers
+app/static/profile_students
+app/static/profile_teachers
 
 # Envs
 .env

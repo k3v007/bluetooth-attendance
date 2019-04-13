@@ -2,12 +2,11 @@ from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_admin.contrib.sqla import ModelView
 from flask_login import current_user, login_required, login_user, logout_user
 
-from btattendance import admin, db
-from btattendance.models import (Attendance, Course, Department, Section,
-                                 Student, Teacher, User)
-from btattendance.tasks import send_reset_mail
-from btattendance.users.forms import (LoginForm, RequestResetForm,
-                                      ResetPasswordForm)
+from app import admin, db
+from app.models import (Attendance, Course, Department, Section, Student,
+                        Teacher, User)
+from app.tasks import send_reset_mail
+from app.users.forms import LoginForm, RequestResetForm, ResetPasswordForm
 
 users = Blueprint("users", __name__)
 

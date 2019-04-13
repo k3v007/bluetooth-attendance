@@ -1,7 +1,7 @@
 from flask import current_app
 from flask_mail import Message
 
-from btattendance import mail
+from app import mail
 
 
 def send_reset_mail(email, url):

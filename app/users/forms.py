@@ -3,7 +3,7 @@ from wtforms import (BooleanField, PasswordField, StringField, SubmitField,
                      ValidationError)
 from wtforms.validators import DataRequired, Email, EqualTo, Length
 
-from btattendance.models import User
+from app.models import User
 
 
 class LoginForm(FlaskForm):

@@ -1,10 +1,11 @@
-from flask_wtf import FlaskForm
-from flask_wtf.file import FileField, FileAllowed
 from flask_login import current_user
-from wtforms import (StringField, PasswordField, SubmitField, BooleanField,
-                     ValidationError, SelectField)
-from wtforms.validators import DataRequired, EqualTo, Length, Email, Regexp
-from btattendance.models import Student, DeptCode
+from flask_wtf import FlaskForm
+from flask_wtf.file import FileAllowed, FileField
+from wtforms import (BooleanField, PasswordField, SelectField, StringField,
+                     SubmitField, ValidationError)
+from wtforms.validators import DataRequired, Email, EqualTo, Length, Regexp
+
+from app.models import DeptCode, Student
 
 
 # Student Register Form Class
