@@ -90,6 +90,7 @@ class Student(User):
     profile_img = db.Column(db.String(50), nullable=False,
                             default='default.jpg')
     bd_addr = db.Column(db.String(90), nullable=False, unique=True)
+    semester = db.Column(db.Integer, nullable=False)
     department_id = db.Column(db.Integer, db.ForeignKey(
                              'departments.id'), nullable=False)
     attendance = db.relationship('Attendance', backref='student', lazy=True)
@@ -102,16 +103,19 @@ class Student(User):
         'polymorphic_identity': 'students',
     }
 
-    def __init__(self, name, rollno, email, password, bd_addr, department):
+    def __init__(self, name, rollno, email, password, bd_addr, department,
+                 semester):
         self.name = name
         self.rollno = rollno
         self.email = email
         self.password_hash = self.generate_password(password)
         self.bd_addr = bd_addr
         self.department_id = department.id
+        self.semester = semester
 
     def __repr__(self):
-        return f"Student('{self.name}', '{self.rollno}', '{self.email}', '{self.bd_addr}', '{self.department_id}')"  # noqa
+        return f"Student('{self.name}', '{self.rollno}', '{self.email}', '{self.bd_addr}',\
+                '{self.department_id}', '{self.semester}')"
 
 
 class Teacher(User):

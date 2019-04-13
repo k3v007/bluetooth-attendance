@@ -29,6 +29,8 @@ class RegistrationForm(FlaskForm):
     ])
     department = SelectField('Department', choices=[
                              (d.name, d.value) for d in DeptCode])
+    semester = SelectField('Semester', choices=[
+                           (str(i), i) for i in range(1, 9)])
     password = PasswordField('Password', validators=[
         DataRequired(),
         Length(min=4, max=50)

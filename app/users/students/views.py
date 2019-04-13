@@ -24,8 +24,8 @@ def register():
             dept_code=DeptCode[form.department.data]).first()
         student = Student(name=form.name.data, rollno=form.rollno.data,
                           email=form.email.data, password=form.password.data,
-                          bd_addr=form.bd_addr.data,
-                          department=dept)
+                          bd_addr=form.bd_addr.data, department=dept,
+                          semester=form.semester.data)
         db.session.add(student)
         db.session.commit()
         flash('Account created successfully! Please Log In.', 'success')
