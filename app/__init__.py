@@ -8,11 +8,14 @@ from flask_admin import Admin   # noqa
 from flask_login import LoginManager    # noqa
 from flask_mail import Mail     # noqa
 from flask_sqlalchemy import SQLAlchemy     # noqa
+from flask_rq2 import RQ    # noqa
+
 
 admin = Admin()
 db = SQLAlchemy()
 login_manager = LoginManager()
 mail = Mail()
+rq = RQ()
 
 
 def create_app():
@@ -23,6 +26,7 @@ def create_app():
     db.init_app(app)
     login_manager.init_app(app)
     mail.init_app(app)
+    rq.init_app(app)
 
     login_manager.login_view = 'users.login'
     login_manager.login_message_category = 'warning'

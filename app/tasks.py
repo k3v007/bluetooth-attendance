@@ -1,13 +1,12 @@
-from flask import current_app
 from flask_mail import Message
 
-from app import mail
+from app import mail, rq
 
 
+@rq.job
 def send_reset_mail(email, url):
-    app = current_app._get_current_object()
     msg = Message(subject='Password Reset Request!',
-                  sender=app.config['FLASY_MAIL_SENDER'],
+                  sender='noreply@bluetooth_attendance.com',
                   recipients=[email],
                   body=f'''To reset your password, visit the following link:
 {url}
