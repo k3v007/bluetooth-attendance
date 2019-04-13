@@ -1,10 +1,9 @@
 from flask import current_app
 from flask_mail import Message
 
-from btattendance import rq, mail
+from btattendance import mail
 
 
-@rq.job
 def send_reset_mail(email, url):
     app = current_app._get_current_object()
     msg = Message(subject='Password Reset Request!',
