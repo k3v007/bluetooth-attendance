@@ -5,9 +5,9 @@ from flask_login import current_user, login_required, login_user, logout_user
 from btattendance import admin, db
 from btattendance.models import (Attendance, Course, Department, Section,
                                  Student, Teacher, User)
+from btattendance.tasks import send_reset_mail
 from btattendance.users.forms import (LoginForm, RequestResetForm,
                                       ResetPasswordForm)
-from btattendance.utils import send_reset_mail
 
 users = Blueprint("users", __name__)
 
@@ -64,7 +64,10 @@ def reset_request():
     form = RequestResetForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
-        send_reset_mail(user)
+        email = user.email
+        url = url_for('users.reset_password', token=user.get_reset_token(),
+                      _external=True)
+        send_reset_mail.queue(email, url)
         flash('An email has been sent with the instructions to reset your password!', 'warning')
         return redirect(url_for('users.login'))
 
@@ -85,7 +88,7 @@ def reset_password(token):
     if form.validate_on_submit():
         user.password_hash = user.generate_password(form.password.data)
         db.session.commit()
-        flash("Your password has been reset successfully! Please Login")
+        flash("Your password has been reset successfully! Please Login", 'info')
         return redirect(url_for('users.login'))
 
     return render_template('reset_password.html', title='Reset Password',

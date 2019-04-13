@@ -5,7 +5,7 @@
     <h1 class="display-4">Bluetooth Attendance WebApp</h1>
     <p></p>
     <p class="lead">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Dolorem doloremque voluptatum molestiae animi accusantium, quam dignissimos aliquam optio! Veritatis, distinctio. Possimus, beatae? Inventore, nostrum. Quod optio ut aut perferendis aliquid!</p>
-    {% if session.logged_in == NULL %}
+    {% if not current_user.is_authenticated %}
       <a href="{{ url_for('users.login') }}" class="btn btn-success btn-lg">Login</a>
       <a href="{{ url_for('students.register') }}" class="btn btn-primary btn-lg">Register</a>
     {% endif %}
