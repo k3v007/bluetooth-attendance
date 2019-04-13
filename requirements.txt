@@ -2,6 +2,7 @@ alembic==1.0.8
 astroid==2.2.5
 autopep8==1.4.3
 blinker==1.4
+certifi==2019.3.9
 Click==7.0
 colorama==0.4.1
 entrypoints==0.3
@@ -26,7 +27,6 @@ mccabe==0.6.1
 mysqlclient==1.4.2.post1
 pef==1.1.0
 Pillow==5.4.1
-psycopg2==2.8.1
 pycodestyle==2.5.0
 pyflakes==2.1.1
 python-dateutil==2.8.0
