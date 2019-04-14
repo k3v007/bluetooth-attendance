@@ -1,10 +1,8 @@
 from flask import Blueprint, flash, redirect, render_template, request, url_for
-from flask_admin.contrib.sqla import ModelView
 from flask_login import current_user, login_required, login_user, logout_user
 
-from app import admin, db
-from app.models import (Attendance, Course, Department, Section, Student,
-                        Teacher, User)
+from app import db
+from app.models import User
 from app.tasks import send_reset_mail
 from app.users.forms import LoginForm, RequestResetForm, ResetPasswordForm
 
@@ -85,21 +83,10 @@ def reset_password(token):
         return redirect(url_for('users.reset_request'))
     form = ResetPasswordForm()
     if form.validate_on_submit():
-        user.password_hash = user.generate_password(form.password.data)
+        user.password = user.generate_password(form.password.data)
         db.session.commit()
         flash("Your password has been reset successfully! Please Login", 'info')
         return redirect(url_for('users.login'))
 
     return render_template('reset_password.html', title='Reset Password',
                            form=form)
-
-
-# add view for admin
-admin.add_views(
-    ModelView(Department, db.session),
-    ModelView(Student, db.session),
-    ModelView(Teacher, db.session),
-    ModelView(Course, db.session),
-    ModelView(Section, db.session),
-    ModelView(Attendance, db.session),
-)
