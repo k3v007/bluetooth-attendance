@@ -2,9 +2,10 @@ from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required, login_user, logout_user
 
 from app import db
-from app.models import User
+from app.models import User, Attendance
 from app.tasks import send_reset_mail
 from app.users.forms import LoginForm, RequestResetForm, ResetPasswordForm
+from app.users.students.forms import StudentAttendanceForm
 
 users = Blueprint("users", __name__)
 
@@ -44,11 +45,18 @@ def logout():
 
 
 # User dashboard
-@users.route('/dashboard')
+@users.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
     if current_user.type == "students":
-        return render_template('dashboardStu.html')
+        form = StudentAttendanceForm()
+        if form.validate_on_submit():
+            attendances = Attendance.query.filter_by(
+                student_id=current_user.id, semester=form.semester.data)
+            count = attendances.count()
+            return render_template('dashboardStu.html', form=form,
+                                   attendances=attendances, count=count)
+        return render_template('dashboardStu.html', form=form, count=0)
     else:
         return render_template('dashboardPro.html')
 

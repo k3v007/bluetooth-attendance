@@ -42,7 +42,7 @@ def save_picture(form_image):
     _, f_ext = os.path.splitext(form_image.filename)
     pic_name = random_name + f_ext    # gererating new random name
 
-    dir_path = os.path.join(students.root_path, '../static/profile_students')
+    dir_path = os.path.join(students.root_path, '../../static/profile_students')
     pic_path = os.path.join(dir_path, pic_name)
     # deleting the old file
     if old_file != 'default.jpg':

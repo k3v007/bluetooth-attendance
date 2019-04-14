@@ -1,7 +1,7 @@
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileAllowed, FileField
-from wtforms import (BooleanField, PasswordField, SelectField, StringField,
+from wtforms import (PasswordField, SelectField, StringField,
                      SubmitField, ValidationError)
 from wtforms.validators import DataRequired, Email, EqualTo, Length, Regexp
 
@@ -56,18 +56,6 @@ class RegistrationForm(FlaskForm):
                 "Bluetooth Address already registered with us!")
 
 
-class LoginForm(FlaskForm):
-    email = StringField('Email', validators=[
-        Email(),
-        DataRequired()
-    ])
-    password = PasswordField('Password', validators=[
-        DataRequired()
-    ])
-    remember = BooleanField('Remember Me')
-    submit = SubmitField('Login')
-
-
 # Update form when data is different from current user data
 class UpdateAccountForm(FlaskForm):
     name = StringField('Name', validators=[
@@ -90,25 +78,7 @@ class UpdateAccountForm(FlaskForm):
                     "Bluetooth Address already registered with us!")
 
 
-class RequestResetForm(FlaskForm):
-    email = StringField('Email', validators=[
-        Email(),
-        DataRequired()
-    ])
+class StudentAttendanceForm(FlaskForm):
+    semester = SelectField('Semester', choices=[
+        (str(i), i) for i in range(1, 9)])
     submit = SubmitField('Submit')
-
-    def validate_email(self, email):
-        if Student.query.filter_by(email=email.data).first() is None:
-            raise ValidationError("This e-mail is not registered with us!")
-
-
-class ResetPasswordForm(FlaskForm):
-    password = PasswordField('Password', validators=[
-        DataRequired(),
-        Length(min=4, max=50)
-    ])
-    confirm_password = PasswordField('Confirm Password', validators=[
-        DataRequired(),
-        EqualTo('password', message='Passwords did not match!')
-    ])
-    submit = SubmitField('Reset Password')
