@@ -53,3 +53,8 @@ class TeacherAttendanceForm(FlaskForm):
     #     (str(i), i) for i in range(2015, 2021)
     # ])
     submit = SubmitField('Submit')
+
+
+class TakeAttendanceForm(FlaskForm):
+    subject = SelectField('Subject', coerce=str)
+    submit = SubmitField('Submit')

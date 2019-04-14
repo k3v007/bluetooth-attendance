@@ -6,8 +6,10 @@ from flask_login import current_user, login_required
 from PIL import Image
 
 from app import db
-from app.models import Department, Teacher
-from app.users.teachers.forms import RegistrationForm, UpdateAccountForm
+from app.models import Department, Student, Subject, Teacher, Attendance
+from app.users.teachers.forms import (RegistrationForm, TakeAttendanceForm,
+                                      UpdateAccountForm)
+from utils import discover_bd
 
 teachers = Blueprint('teachers', __name__)
 
@@ -30,35 +32,34 @@ def register():
     return render_template('registerPro.html', form=form, title='Register')
 
 
-# # Check Attendance
-# @teachers.route('/check_attendance')
-# @is_logged_in
-# def check_attendance():
-#     sub = session['subject']  
-#     # DB task
-#     # result = cur.execute("SELECT bd_addr FROM students")
-#     result = []
-#     cur = []
-#     bd_addrs = cur.fetchall()
+# Check Attendance
+@teachers.route('/check_attendance', methods=['GET', 'POST'])
+@login_required
+def check_attendance():
+    if current_user.type != "teachers":
+        return redirect(url_for('users.dashboard'))
 
-#     print(bd_addrs)
-#     if result > 0:
-#         print("Hello1")
-#         # bluescan.delay(bd_addrs, sub)
-#         return render_template('scan_prog.html')
-#     else:
-#         msg = 'No Records Found'
-#         return render_template('dashboardPro.html', msg=msg)
+    subjects = Subject.query.with_entities(Subject.subject_code).filter_by(teacher_id=current_user.id)   # noqa
+    form = TakeAttendanceForm()
+    form.subject.choices = [(s.subject_code, s.subject_code) for s in subjects]     # noqa
 
-
-# # Delete Attendance
-# @teachers.route('/delete_attendance/<string:id>', methods=['POST'])
-# @is_logged_in
-# def delete_attendance(id):
-#     # DB task
-#     flash('Attendance Deleted', 'success')
-
-#     return redirect(url_for('users.dashboard'))
+    if form.validate_on_submit():
+        subject = Subject.query.filter_by(subject_code=form.subject.data).first()
+        semester = subject.semester
+        dept = subject.department_id
+        students = Student.query.filter_by(semester=semester,
+                                           department_id=dept)
+        devices = discover_bd()
+        for student in students:
+            status = False
+            if student.bd_addr in devices:
+                status = True
+            a = Attendance(status=status, semester=semester,
+                           student_id=student.id, subject_id=subject.id)
+            db.session.add(a)
+            db.session.commit()
+        return render_template('scan_prog.html', check=False, form=form)
+    return render_template('scan_prog.html', check=True, form=form)
 
 
 # here's some caching issue if image is saved with the same file name as
