@@ -1,30 +1,40 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-  <h1 class="pt-2">Dashboard <small> Welcome Teacher {{session.username}}</small></h1>
-  <a class="btn btn-success" href="/check_attendance"> Check Attendance</a>
+  <h1 class="pt-4">My Dashboard</h1>
+  <div class="row justify-content-md-center">
+    <form class="form-inline", method="POST">
+      {{ form.hidden_tag() }}
+      <div class="form-group mx-sm-3 mb-2">
+          {{ form.subject.label(class="mr-2") }}
+          {{ form.subject(class="form-control") }}
+        </div>
+      <div class="form-group">
+        {{ form.submit(class="btn btn-primary mb-2 ml-2") }}
+      </div>
+    </form>
+  </div>
   <hr>
- <table class="table table-striped">
+  {% if count >= 1 %}
+  <table class="table table-striped">
     <tr>
-      <th>Name</th>
-      <th>Subject</th>
-      <th>Attendance</th>
+      <th>Roll No</th>
+      <th>Student</th>
       <th>Date</th>
-      <th></th>
+      <th>Status</th>      
     </tr>
-    {% for attend in attends %}
-      <tr>
-        <td>{{attend.name}}</td>
-        <td>{{attend.subject}}</td>
-        <td>{{attend.presabs}}</td>
-        <td>{{attend.class_date}}</td>
-        <td>
-          <form action="{{url_for('teachers.delete_attendance', id=attend.id)}}" method="post">
-            <input type="hidden" name="_method" value="DELETE">
-            <input type="submit" value="Delete" class="btn btn-danger">
-          </form>
-        </td>
-      </tr>
-    {% endfor %}
+    {% for attendance in attendances %}
+    <tr>
+      <td>{{ attendance.student.rollno }}</td>
+      <td>{{ attendance.student.name }}</td>
+      <td>{{ attendance.date }}</td>
+      <td>{% if attendance.status %} <i class="fas fa-check"></i> {% else %} <i class="fas fa-times"></i> {% endif %}</td>
+    </tr>
+    {% endfor %} 
   </table>
+  {% else %}
+  <div class="container text-center">
+    {{ msg }}
+  </div>
+  {% endif %}
 {% endblock %}

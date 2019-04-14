@@ -1,11 +1,15 @@
+# import calendar
+# import datetime
+
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required, login_user, logout_user
 
 from app import db
-from app.models import User, Attendance
+from app.models import Attendance, Subject, User
 from app.tasks import send_reset_mail
 from app.users.forms import LoginForm, RequestResetForm, ResetPasswordForm
 from app.users.students.forms import StudentAttendanceForm
+from app.users.teachers.forms import TeacherAttendanceForm
 
 users = Blueprint("users", __name__)
 
@@ -55,10 +59,31 @@ def dashboard():
                 student_id=current_user.id, semester=form.semester.data)
             count = attendances.count()
             return render_template('dashboardStu.html', form=form,
-                                   attendances=attendances, count=count)
-        return render_template('dashboardStu.html', form=form, count=0)
+                                   attendances=attendances, count=count,
+                                   msg="No data found!")
+        return render_template('dashboardStu.html', form=form, count=0,
+                               msg="Check your Attendance!")
     else:
-        return render_template('dashboardPro.html')
+        # type is "teachers"
+        subjects = Subject.query.with_entities(Subject.subject_code).filter_by(teacher_id=current_user.id)   # noqa
+        form = TeacherAttendanceForm()
+        form.subject.choices = [(s.subject_code, s.subject_code) for s in subjects]     # noqa
+
+        if form.validate_on_submit():
+            # year = int(form.year.data)
+            # month = int(form.month.data)
+            # _, num_days = calendar.monthrange(year, month)
+            # first_day = datetime.datetime(year, month, num_days)
+            # last_day = datetime.datetime(year, month, 1)
+
+            subject = Subject.query.filter_by(subject_code=form.subject.data).first()   # noqa
+            attendances = Attendance.query.filter_by(subject_id=subject.id) # noqa
+            count = attendances.count()
+            return render_template('dashboardPro.html', form=form,
+                                   attendances=attendances, count=count,
+                                   msg="No data found!")
+        return render_template('dashboardPro.html', form=form, count=0,
+                               msg="Check Student's Attendance!")
 
 
 # Request password reset

@@ -42,3 +42,14 @@ class UpdateAccountForm(FlaskForm):
     picture = FileField('Upload Profile Picture', validators=[
                         FileAllowed(['jpg', 'png', 'gif'])])
     submit = SubmitField('Update')
+
+
+class TeacherAttendanceForm(FlaskForm):
+    subject = SelectField('Subject', coerce=str)
+    # month = SelectField('Month', choices=[
+    #     (str(i), i) for i in range(1, 13)
+    # ])
+    # year = SelectField('Year', choices=[
+    #     (str(i), i) for i in range(2015, 2021)
+    # ])
+    submit = SubmitField('Submit')
