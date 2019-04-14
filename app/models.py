@@ -1,4 +1,3 @@
-import enum
 import os
 from datetime import datetime
 
@@ -24,12 +23,6 @@ class Department(db.Model):
     students = db.relationship('Student', backref='department', lazy=True)
     teachers = db.relationship('Teacher', backref='department', lazy=True)
     subjects = db.relationship('Subject', backref='department', lazy=True)
-
-    def __init__(self, dept_code, dept_name, hod, hod_email):
-        self.dept_code = dept_code.upper()
-        self.dept_name = ' '.join([i.capitalize() for i in dept_name.split()])
-        self.hod = hod
-        self.hod_email = hod_email
 
     def __repr__(self):
         return f"{self.dept_name} ({self.dept_code})"
@@ -94,8 +87,7 @@ class Student(User):
         self.semester = semester
 
     def __repr__(self):
-        return f"Student('{self.name}', '{self.rollno}', '{self.email}',\
-                '{self.bd_addr}', '{self.department_id}', '{self.semester}')"
+        return f"{self.name} ({self.rollno})"
 
 
 class Teacher(User):
@@ -117,8 +109,7 @@ class Teacher(User):
         self.department_id = department.id
 
     def __repr__(self):
-        return f"Teacher('{self.name}', '{self.email}',\
-                '{self.department_id}')"
+        return f"{self.name} ({self.department.dept_code})"
 
 
 class Subject(db.Model):
@@ -126,44 +117,28 @@ class Subject(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     subject_code = db.Column(db.String(5), nullable=False, unique=True)
     name = db.Column(db.String(100), nullable=False)
+    semester = db.Column(db.Integer, nullable=False)
     teacher_id = db.Column(db.Integer, db.ForeignKey('teachers.id'),
                            nullable=False)
     department_id = db.Column(db.Integer, db.ForeignKey(
         'departments.id'), nullable=False)
-
-    def __init__(self, subject_code, name, credit, teacher, department):
-        self.subject_code = subject_code
-        self.name = name
-        self.credit = credit
-        self.teacher_id = teacher.id
-        self.department_id = department.id
+    attendances = db.relationship('Attendance', backref='subject', lazy=True)
 
     def __repr__(self):
-        return f"Subject('{self.subject_code}', '{self.name}', '{self.credit}',\
-                '{self.department_id}','{self.teacher_id}')"
-
-
-class Status(enum.Enum):
-    A = 'absent'
-    P = 'present'
+        return f"{self.name} ({self.subject_code})"
 
 
 class Attendance(db.Model):
     __tablename__ = 'attendance'
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    status = db.Column(db.Enum(Status), nullable=False)
+    status = db.Column(db.Boolean, nullable=False)
+    semester = db.Column(db.Integer, nullable=False)
     student_id = db.Column(db.Integer, db.ForeignKey(
         'students.id'), nullable=False)
     subject_id = db.Column(db.Integer, db.ForeignKey(
         'subjects.id'), nullable=False)
 
-    def __init__(self, date, status, student, subject):
-        self.date = date
-        self.status = status
-        self.student_id = student.id
-        self.subject_id = subject.id
-
     def __repr__(self):
-        return f"Subject({self.date}, {self.status}, {self.student_id},\
-                {self.subject_id})"
+        return f"Subject({self.date}, {self.status}, {self.semester},\
+                {self.student_id}, {self.subject_id})"
