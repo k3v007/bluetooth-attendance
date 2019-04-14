@@ -14,40 +14,25 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
-class DeptCode(enum.Enum):
-    bt = 'Bio-technology'
-    coe = 'Computer Engineering'
-    ece = 'Electronics and Communication Engineering'
-    ice = 'Instrumentation and Control Engineering'
-    it = 'Information Technology'
-    me = 'Mechanical Engineering'
-
-
 class Department(db.Model):
     __tablename__ = 'departments'
     id = db.Column(db.Integer, primary_key=True)
-    dept_code = db.Column(db.Enum(DeptCode), nullable=False)
+    dept_code = db.Column(db.String(5), nullable=False)
+    dept_name = db.Column(db.String(100), nullable=False)
     hod = db.Column(db.String(50), nullable=False, unique=True)
     hod_email = db.Column(db.String(80), nullable=False, unique=True)
     students = db.relationship('Student', backref='department', lazy=True)
     teachers = db.relationship('Teacher', backref='department', lazy=True)
-    courses = db.relationship('Course', backref='department', lazy=True)
+    subjects = db.relationship('Subject', backref='department', lazy=True)
 
-    def __init__(self, dept_code, hod, hod_email):
-        self.dept_code = DeptCode[dept_code]
+    def __init__(self, dept_code, dept_name, hod, hod_email):
+        self.dept_code = dept_code.upper()
+        self.dept_name = ' '.join([i.capitalize() for i in dept_name.split()])
         self.hod = hod
         self.hod_email = hod_email
 
     def __repr__(self):
-        return f"Department({self.dept_code}', '{self.hod}', '{self.hod_email}')"
-
-
-registration = db.Table('registration_info',
-                        db.Column('student_id', db.Integer, db.ForeignKey(
-                            'students.id'), primary_key=True),
-                        db.Column('section_id', db.Integer, db.ForeignKey(
-                            'sections.id'), primary_key=True)
-                        )
+        return f"{self.dept_name} ({self.dept_code})"
 
 
 class User(db.Model, UserMixin):
@@ -55,7 +40,7 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(80), nullable=False, unique=True)
-    password_hash = db.Column(db.String(100), nullable=False)
+    password = db.Column(db.String(100), nullable=False)
     active = db.Column(db.Boolean, nullable=False, default=True)
     type = db.Column(db.String(20), default="user")
     __mapper_args__ = {
@@ -67,7 +52,7 @@ class User(db.Model, UserMixin):
         return generate_password_hash(password)
 
     def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
+        return check_password_hash(self.password, password)
 
     def get_reset_token(self, expires_sec=1800):
         s = Serializer(os.environ.get('SECRET_KEY'), expires_sec)
@@ -94,11 +79,6 @@ class Student(User):
     department_id = db.Column(db.Integer, db.ForeignKey(
                              'departments.id'), nullable=False)
     attendance = db.relationship('Attendance', backref='student', lazy=True)
-    registration_info = db.relationship('Section', secondary=registration,
-                                        lazy='subquery',
-                                        backref=db.backref(
-                                            'department', lazy=True)
-                                        )
     __mapper_args__ = {
         'polymorphic_identity': 'students',
     }
@@ -108,14 +88,14 @@ class Student(User):
         self.name = name
         self.rollno = rollno
         self.email = email
-        self.password_hash = self.generate_password(password)
+        self.password = self.generate_password(password)
         self.bd_addr = bd_addr
         self.department_id = department.id
         self.semester = semester
 
     def __repr__(self):
-        return f"Student('{self.name}', '{self.rollno}', '{self.email}', '{self.bd_addr}',\
-                '{self.department_id}', '{self.semester}')"
+        return f"Student('{self.name}', '{self.rollno}', '{self.email}',\
+                '{self.bd_addr}', '{self.department_id}', '{self.semester}')"
 
 
 class Teacher(User):
@@ -123,7 +103,7 @@ class Teacher(User):
     id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
     profile_img = db.Column(db.String(50), nullable=False,
                             default='default.jpg')
-    sections = db.relationship('Section', backref='teacher', lazy=True)
+    subjects = db.relationship('Subject', backref='teacher', lazy=True)
     department_id = db.Column(db.Integer, db.ForeignKey(
         'departments.id'), nullable=False)
     __mapper_args__ = {
@@ -133,55 +113,39 @@ class Teacher(User):
     def __init__(self, name, email, password, department):
         self.name = name
         self.email = email
-        self.password_hash = generate_password_hash(password)
+        self.password = generate_password_hash(password)
         self.department_id = department.id
 
     def __repr__(self):
-        return f"Teacher('{self.name}', '{self.email}', '{self.department_id}')"  # noqa
+        return f"Teacher('{self.name}', '{self.email}',\
+                '{self.department_id}')"
 
 
-class Course(db.Model):
-    __tablename__ = 'courses'
+class Subject(db.Model):
+    __tablename__ = 'subjects'
     id = db.Column(db.Integer, primary_key=True)
-    course_code = db.Column(db.String(5), nullable=False, unique=True)
+    subject_code = db.Column(db.String(5), nullable=False, unique=True)
     name = db.Column(db.String(100), nullable=False)
-    credit = db.Column(db.Integer, nullable=False)
-    sections = db.relationship('Section', backref='course', lazy=True)
+    teacher_id = db.Column(db.Integer, db.ForeignKey('teachers.id'),
+                           nullable=False)
     department_id = db.Column(db.Integer, db.ForeignKey(
         'departments.id'), nullable=False)
 
-    def __init__(self, course_code, name, credit, department):
-        self.course_code = course_code
+    def __init__(self, subject_code, name, credit, teacher, department):
+        self.subject_code = subject_code
         self.name = name
         self.credit = credit
+        self.teacher_id = teacher.id
         self.department_id = department.id
 
     def __repr__(self):
-        return f"Course('{self.course_code}', '{self.name}', '{self.credit}', '{self.department_id}')"  # noqa
-
-
-class Section(db.Model):
-    __tablename__ = 'sections'
-    id = db.Column(db.Integer, primary_key=True)
-    semester = db.Column(db.Integer, nullable=False)
-    course_id = db.Column(db.Integer, db.ForeignKey(
-        'courses.id'), nullable=False)
-    teacher_id = db.Column(db.Integer, db.ForeignKey(
-        'teachers.id'), nullable=False)
-    attendance = db.relationship('Attendance', backref='section', lazy=True)
-
-    def __init__(self, semester, course, teacher):
-        self.semester = semester
-        self.course_id = course.id
-        self.teacher_id = teacher.id
-
-    def __repr__(self):
-        return f"Subject({self.semester}, {self.course_id}, {self.teacher_id})"
+        return f"Subject('{self.subject_code}', '{self.name}', '{self.credit}',\
+                '{self.department_id}','{self.teacher_id}')"
 
 
 class Status(enum.Enum):
-    abs = 'absent'
-    pres = 'present'
+    A = 'absent'
+    P = 'present'
 
 
 class Attendance(db.Model):
@@ -191,14 +155,15 @@ class Attendance(db.Model):
     status = db.Column(db.Enum(Status), nullable=False)
     student_id = db.Column(db.Integer, db.ForeignKey(
         'students.id'), nullable=False)
-    section_id = db.Column(db.Integer, db.ForeignKey(
-        'sections.id'), nullable=False)
+    subject_id = db.Column(db.Integer, db.ForeignKey(
+        'subjects.id'), nullable=False)
 
-    def __init__(self, date, status, student, section):
+    def __init__(self, date, status, student, subject):
         self.date = date
         self.status = status
         self.student_id = student.id
-        self.section_id = section.id
+        self.subject_id = subject.id
 
     def __repr__(self):
-        return f"Subject({self.date}, {self.status}, {self.student_id}, {self.section_id})"
+        return f"Subject({self.date}, {self.status}, {self.student_id},\
+                {self.subject_id})"

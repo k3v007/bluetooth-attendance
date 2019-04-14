@@ -6,7 +6,7 @@ from flask_login import current_user, login_required
 from PIL import Image
 
 from app import db
-from app.models import Department, DeptCode, Teacher
+from app.models import Department, Teacher
 from app.users.teachers.forms import RegistrationForm, UpdateAccountForm
 
 teachers = Blueprint('teachers', __name__)
@@ -20,7 +20,7 @@ def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         dept = Department.query.filter_by(
-            dept_code=DeptCode[form.department.data]).first()
+            dept_code=form.department.data).first()
         teacher = Teacher(name=form.name.data, email=form.email.data,
                           password=form.password.data, department=dept)
         db.session.add(teacher)

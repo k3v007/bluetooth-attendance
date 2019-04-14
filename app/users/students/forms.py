@@ -5,7 +5,8 @@ from wtforms import (BooleanField, PasswordField, SelectField, StringField,
                      SubmitField, ValidationError)
 from wtforms.validators import DataRequired, Email, EqualTo, Length, Regexp
 
-from app.models import DeptCode, Student
+from app.models import Student, User
+from app.utils import get_dept_name_value
 
 
 # Student Register Form Class
@@ -27,8 +28,7 @@ class RegistrationForm(FlaskForm):
         DataRequired(),
         Regexp('^([0-9A-Fa-f]{2}[:]){5}([0-9A-Fa-f]{2})$', message="Enter valid BD_ADDR [00:00:00:00:00:00]")  # noqa
     ])
-    department = SelectField('Department', choices=[
-                             (d.name, d.value) for d in DeptCode])
+    department = SelectField('Department', choices=get_dept_name_value())
     semester = SelectField('Semester', choices=[
                            (str(i), i) for i in range(1, 9)])
     password = PasswordField('Password', validators=[
@@ -42,7 +42,7 @@ class RegistrationForm(FlaskForm):
     submit = SubmitField('Sign Up')
 
     def validate_email(self, email):
-        if Student.query.filter_by(email=email.data).first():
+        if User.query.filter_by(email=email.data).first():
             raise ValidationError("This e-mail is already registered with us!")
 
     def validate_rollno(self, rollno):

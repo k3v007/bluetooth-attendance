@@ -1,9 +1,21 @@
 from flask import render_template
 
-from app import create_app
+from app import create_app, db
+from app.models import Department
+from app.utils import load_departments
 
 
 flask_app = create_app()
+
+
+@flask_app.before_first_request
+def insert_dept():
+    # Check if table already exists or not
+    if db.session.query(Department).first() is None:
+        departments = load_departments()
+        for dept in departments:
+            db.session.add(Department(**dept))
+        db.session.commit()
 
 
 # Home

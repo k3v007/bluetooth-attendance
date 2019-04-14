@@ -6,7 +6,7 @@ from flask_login import current_user, login_required
 from PIL import Image
 
 from app import db
-from app.models import Department, DeptCode, Student
+from app.models import Department, Student
 from app.users.students.forms import RegistrationForm, UpdateAccountForm
 
 
@@ -21,7 +21,7 @@ def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         dept = Department.query.filter_by(
-            dept_code=DeptCode[form.department.data]).first()
+            dept_code=form.department.data).first()
         student = Student(name=form.name.data, rollno=form.rollno.data,
                           email=form.email.data, password=form.password.data,
                           bd_addr=form.bd_addr.data, department=dept,

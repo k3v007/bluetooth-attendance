@@ -4,7 +4,8 @@ from wtforms import (PasswordField, SelectField, StringField, SubmitField,
                      ValidationError)
 from wtforms.validators import DataRequired, Email, EqualTo, Length
 
-from app.models import DeptCode, Teacher
+from app.models import User
+from app.utils import get_dept_name_value
 
 
 class RegistrationForm(FlaskForm):
@@ -16,8 +17,7 @@ class RegistrationForm(FlaskForm):
         Email(),
         DataRequired()
     ])
-    department = SelectField('Department', choices=[
-                             (d.name, d.value) for d in DeptCode])
+    department = SelectField('Department', choices=get_dept_name_value())
     password = PasswordField('Password', validators=[
         DataRequired(),
         Length(min=4, max=50)
@@ -29,7 +29,7 @@ class RegistrationForm(FlaskForm):
     submit = SubmitField('Sign Up')
 
     def validate_email(self, email):
-        if Teacher.query.filter_by(email=email.data).first():
+        if User.query.filter_by(email=email.data).first():
             raise ValidationError("This e-mail is already registered with us!")
 
 
