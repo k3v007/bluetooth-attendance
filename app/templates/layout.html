@@ -40,6 +40,11 @@
                     {% endif %}
                 </li>
                 <li class="nav-item active">
+                    {% if current_user.type == 'teachers' %}
+                    <a class="nav-link" href="{{ url_for('teachers.check_attendance') }}">Check Attendance</a>
+                    {% endif %}
+                </li>
+                <li class="nav-item active">
                     <a class="nav-link" href="{{ url_for('users.logout') }}">Logout</a>
                 </li>
                 {% else %}

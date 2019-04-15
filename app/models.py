@@ -131,7 +131,7 @@ class Subject(db.Model):
 class Attendance(db.Model):
     __tablename__ = 'attendance'
     id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    date = db.Column(db.DateTime, nullable=False, default=datetime.now)
     status = db.Column(db.Boolean, nullable=False)
     semester = db.Column(db.Integer, nullable=False)
     student_id = db.Column(db.Integer, db.ForeignKey(
