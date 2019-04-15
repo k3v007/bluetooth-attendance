@@ -1,6 +1,4 @@
 import csv
-import time
-from bluetooth import discover_devices
 
 
 def load_departments():
@@ -15,13 +13,3 @@ def get_dept_name_value():
     for dept in depts:
         pairs.append((dept['dept_code'], dept['dept_name']))
     return pairs
-
-
-def discover_bd(seconds=10):
-    t_end = time.time() + seconds
-    devices = set()
-
-    while time.time() < t_end:
-        temp = discover_devices()
-        devices.update(temp)
-    return devices

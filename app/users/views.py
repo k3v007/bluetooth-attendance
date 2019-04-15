@@ -77,7 +77,7 @@ def dashboard():
             # last_day = datetime.datetime(year, month, 1)
 
             subject = Subject.query.filter_by(subject_code=form.subject.data).first()   # noqa
-            attendances = Attendance.query.filter_by(subject_id=subject.id) # noqa
+            attendances = Attendance.query.filter_by(subject_id=subject.id).order_by(Attendance.date) # noqa
             count = attendances.count()
             return render_template('dashboardPro.html', form=form,
                                    attendances=attendances, count=count,

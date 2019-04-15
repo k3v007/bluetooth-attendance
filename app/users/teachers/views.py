@@ -1,15 +1,16 @@
 import os
 from secrets import token_hex
 
-from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask import (Blueprint, flash, redirect, render_template, request,
+                   session, url_for)
 from flask_login import current_user, login_required
 from PIL import Image
 
-from app import db
-from app.models import Department, Student, Subject, Teacher, Attendance
+from app import db, rq
+from app.models import Attendance, Department, Student, Subject, Teacher
+from app.tasks import discover_bd
 from app.users.teachers.forms import (RegistrationForm, TakeAttendanceForm,
                                       UpdateAccountForm)
-from utils import discover_bd
 
 teachers = Blueprint('teachers', __name__)
 
@@ -44,22 +45,35 @@ def check_attendance():
     form.subject.choices = [(s.subject_code, s.subject_code) for s in subjects]     # noqa
 
     if form.validate_on_submit():
-        subject = Subject.query.filter_by(subject_code=form.subject.data).first()
-        semester = subject.semester
-        dept = subject.department_id
-        students = Student.query.filter_by(semester=semester,
-                                           department_id=dept)
-        devices = discover_bd()
-        for student in students:
-            status = False
-            if student.bd_addr in devices:
-                status = True
-            a = Attendance(status=status, semester=semester,
-                           student_id=student.id, subject_id=subject.id)
-            db.session.add(a)
-            db.session.commit()
+        session['subject'] = form.subject.data
+        devices = discover_bd.queue()
+        session['id'] = devices.id
         return render_template('scan_prog.html', check=False, form=form)
     return render_template('scan_prog.html', check=True, form=form)
+
+
+@teachers.route('/add')
+def add_attendance():
+    rid = session.pop('id', None)
+    sub = session.pop('subject', None)
+    subject = Subject.query.filter_by(subject_code=sub).first()
+    semester = subject.semester
+    dept = subject.department_id
+    devices = rq.get_queue().fetch_job(rid).result
+    # print(devices)
+
+    students = Student.query.filter_by(semester=semester,
+                                       department_id=dept)
+
+    for student in students:
+        status = False
+        if devices is not None and student.bd_addr.upper() in devices:
+            status = True
+        a = Attendance(status=status, semester=semester,
+                       student_id=student.id, subject_id=subject.id)
+        db.session.add(a)
+        db.session.commit()
+    return redirect(url_for('users.dashboard'))
 
 
 # here's some caching issue if image is saved with the same file name as

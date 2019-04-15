@@ -1,9 +1,9 @@
 {% extends 'layout.html' %}
 
 {% block body %}
+{% if check %}
 <h1 class="py-4 text-center">Check Attendance</h1>
 <div class="row justify-content-md-center">
-    {% if check %}
     <form class="form-inline", method="POST">
         {{ form.hidden_tag() }}
         <div class="form-group mx-sm-3 mb-2">
@@ -14,12 +14,20 @@
             {{ form.submit(class="btn btn-primary mb-2 ml-2") }}
         </div>
     </form>
-    {% else %}
-    <h1>Scanning In Progress</h1>
-    <img src="{{ url_for('static', filename='radar-loading.gif') }}">
-    <p>Please wait for about 1 minute and then Check your Dashboard.</p>
-    <a href="/dashboard" class="btn btn-primary btn-lg">Go back to Dashboard</a>
-    {% endif %}
 </div>
+{% else %}
+<div class="text-center">
+    <h1 class="mt-4">Scanning In Progress</h1>
+    <div class="pt-4">
+        <img src="{{ url_for('static', filename='radar-loading.gif') }}">
+    </div>
+    <br>
+    <br>
+    <p>Please wait for about 1 minute and then Check your Dashboard.</p>
+    <br>
+    <a href="{{ url_for('teachers.add_attendance') }}" class="btn btn-primary btn-lg">Go back to Dashboard</a>
+</div>
+{% endif %}
+
         
 {% endblock %}
